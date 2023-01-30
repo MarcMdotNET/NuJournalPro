@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NuJournalPro.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace NuJournalPro.Models.Database
