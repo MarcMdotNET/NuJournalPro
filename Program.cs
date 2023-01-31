@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NuJournalPro.Data;
 using NuJournalPro.Models.Database;
@@ -31,6 +32,7 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("ContactUsSettings"));
 
 // Register custom services.
+builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<SetupDataService>();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
 namespace NuJournalPro.Models.Database
@@ -26,7 +27,7 @@ namespace NuJournalPro.Models.Database
         [Display(Name = "Modified")]
         [DataType(DataType.DateTime)]
         public DateTime? Modified { get; set; }
-
+        
         // Database Navigation Properties
         [Display(Name = "Author")]
         public virtual NuJournalUser? NuJournalUser { get; set; }

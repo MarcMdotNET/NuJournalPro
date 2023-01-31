@@ -81,7 +81,7 @@ namespace NuJournalPro.Models.Identity
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string? ConfirmPassword { get; set; }
-        public ProfilePicture ProfilePicture { get; set; } = new ProfilePicture();
+        public ProfilePicture? ProfilePicture { get; set; }
         public IFormFile? ImageFile { get; set; }
 
         [Display(Name = "Joined")]

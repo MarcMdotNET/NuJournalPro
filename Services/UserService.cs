@@ -31,64 +31,115 @@ namespace NuJournalPro.Services
             _dbContext = dbContext;
         }
 
-        public async Task<NuJournalUser> CreateNewUserAsync(UserInputModel userModel, UserInfo? parentUserInfo = null, IFormFile? userProfilePictureFile = null)
+        public async Task<NuJournalUser> CreateNewUserAsync(UserInputModel userModel, UserInfo? parentUserInfo = null, IFormFile? profilePictureFile = null)
         {
             NuJournalUser newUser = Activator.CreateInstance<NuJournalUser>();
-            newUser.UserName = userModel.Email;
-            newUser.Email = userModel.Email;
-            newUser.FirstName = userModel.FirstName;
-            newUser.MiddleName = userModel.MiddleName;
-            newUser.LastName = userModel.LastName;
-            newUser.DisplayName = userModel.DisplayName;
-            newUser.PhoneNumber = userModel.PhoneNumber;
+            if (userModel.Email != null)
+            {
+                newUser.UserName = userModel.Email;
+                newUser.Email = userModel.Email;
+            }
+            else throw new ArgumentNullException(nameof(newUser.UserName));
+            if (userModel.FirstName != null) newUser.FirstName = userModel.FirstName;
+            if (userModel.MiddleName != null) newUser.MiddleName = userModel.MiddleName;
+            if (userModel.LastName != null) newUser.LastName = userModel.LastName;
+            if (userModel.DisplayName != null) newUser.DisplayName = userModel.DisplayName;
+            if (userModel.PhoneNumber != null) newUser.PhoneNumber = userModel.PhoneNumber;
 
             if (parentUserInfo != null)
             {
-                newUser.CreatedByUser = parentUserInfo.UserName;
-                newUser.CreatedByRoles = parentUserInfo.UserRoles;
+                if (parentUserInfo.UserName != null) newUser.CreatedByUser = parentUserInfo.UserName;
+                if (parentUserInfo.UserRoles != null) newUser.CreatedByRoles = parentUserInfo.UserRoles;
             }
             else newUser.CreatedByUser = "User Service"; // In this case the User Role(s) will be added automatically by the NuJournalUser data model.
 
-            if (userProfilePictureFile != null) newUser.ProfilePicture = (ProfilePicture)await _imageService.CreateCompressedImageAsync(userProfilePictureFile);
+            if (profilePictureFile != null) newUser.ProfilePicture = (ProfilePicture?)await _imageService.CreateCompressedImageAsync(profilePictureFile);
 
             return newUser;
         }
 
-        public async Task<string> GetAccessDeniedImageAsync()
+        public async Task<string?> GetAccessDeniedImageAsync()
         {
-            return _imageService.DecodeImage(await _imageService.EncodeImageDataAsync(_defaultGraphics.SecureAccess), _imageService.GetImageMimeType(_defaultGraphics.SecureAccess));
-        }
-
-        public async Task<ProfilePicture> GetDefaultProfilePictureAsync()
-        {
-            return (ProfilePicture)await _imageService.CreateCompressedImageAsync(_defaultUserSettings.ProfilePicture);
-        }
-
-        public async Task<UserInfo> GetUserInfoAsync(NuJournalUser user)
-        {
-            return new UserInfo()
+            if (_defaultGraphics.SecureAccess == null)
             {
-                UserName = await _userManager.GetUserNameAsync(user),
-                UserRoles = await _userManager.GetRolesAsync(user) as List<string>
-            };
+                string defaultPath = "/appresources/default/img/";
+                string defaultImage = "AccessDenied.svg";
+                var defaultEncodedImageData = await _imageService.EncodeImageDataAsync(defaultImage, false, defaultPath);
+                var defaultImageMimeType = _imageService.GetImageMimeType(defaultImage);
+                if (defaultEncodedImageData != null && defaultImageMimeType != null)
+                {
+                    var defaultDecodedImage = _imageService.DecodeImage(defaultEncodedImageData, defaultImageMimeType);
+                    if (defaultDecodedImage != null) return defaultDecodedImage;
+                    else return null;
+                }
+                else return null;
+            }
+            else
+            {
+                var encodedImageData = await _imageService.EncodeImageDataAsync(_defaultGraphics.SecureAccess);
+                var imageMimeType = _imageService.GetImageMimeType(_defaultGraphics.SecureAccess);
+                if (encodedImageData != null && imageMimeType != null)
+                {
+                    var decodedImage = _imageService.DecodeImage(encodedImageData, imageMimeType);
+                    if (decodedImage != null) return decodedImage;
+                    else return null;
+                }
+                else return null;
+            }
+        }
+
+        public async Task<ProfilePicture?> GetDefaultProfilePictureAsync()
+        {
+            if (_defaultUserSettings.ProfilePicture == null)
+            {
+                string defaultPath = "/appresources/default/img/";
+                string defaultImage = "ProfilePicture.svg";
+                return (ProfilePicture?)await _imageService.CreateCompressedImageAsync(defaultImage, defaultPath);
+            }
+            else return (ProfilePicture?)await _imageService.CreateCompressedImageAsync(_defaultUserSettings.ProfilePicture);
+        }
+
+        public async Task<UserInfo?> GetUserInfoAsync(NuJournalUser user)
+        {
+            if (user != null)
+            {
+                return new UserInfo()
+                {
+                    UserName = await _userManager.GetUserNameAsync(user),
+                    UserRoles = await _userManager.GetRolesAsync(user) as List<string>
+                };
+            }
+            else return null;
         }
 
         public bool IsAdmin(NuJournalUser user)
         {
-            if (user.UserRolesString.Contains(NuJournalUserRole.Administrator.ToString()) && !user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString())) return true;
-            else return false;
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            else
+            {
+                if (user.UserRolesString.Contains(NuJournalUserRole.Administrator.ToString()) && !user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString())) return true;
+                else return false;
+            }
         }
 
         public bool IsOwner(NuJournalUser user)
         {
-            if (user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString())) return true;
-            else return false;
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            else
+            {
+                if (user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString())) return true;
+                else return false;
+            }
         }
 
         public bool IsAdministration(NuJournalUser user)
         {
-            if (!user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString()) && !user.UserRolesString.Contains(NuJournalUserRole.Administrator.ToString())) return false;
-            else return true;
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            else
+            {
+                if (!user.UserRolesString.Contains(NuJournalUserRole.Owner.ToString()) && !user.UserRolesString.Contains(NuJournalUserRole.Administrator.ToString())) return false;
+                else return true;
+            }
         }
 
         public bool IsDisplayNameUnique(string displayName)
@@ -118,7 +169,7 @@ namespace NuJournalPro.Services
             return false;
         }
 
-        public string GenerateRandomPassword(PasswordOptions pwdOptions = null)
+        public string GenerateRandomPassword(PasswordOptions? pwdOptions = null)
         {
             if (pwdOptions == null)
             {
@@ -157,9 +208,9 @@ namespace NuJournalPro.Services
             return new string(chars.ToArray());
         }
 
-        public async Task<UserInputModel> GetExistingUserInputAsync(NuJournalUser existingUser)
+        public async Task<UserInputModel?> GetExistingUserInputAsync(NuJournalUser existingUser)
         {
-            if (existingUser is null) return null;
+            if (existingUser == null) return null;
             else
             {
                 return new UserInputModel()
@@ -181,59 +232,64 @@ namespace NuJournalPro.Services
             }
         }
 
-        public List<NuJournalUser> GetAppUserList(NuJournalUser user) // Needs fixing.
+        public List<NuJournalUser>? GetAppUserList(NuJournalUser user)
         {
-            if (IsOwner(user))
-            {
-                var userList = new List<NuJournalUser>();
-                userList = _userManager.Users.Cast<NuJournalUser>()
-                                         .Where(u => !u.UserName.Equals(user.UserName))
-                                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
-                                         .OrderBy(r => r.UserRoles)
-                                         .OrderBy(n => n.LastName)
-                                         .OrderBy(n => n.FirstName)
-                                         .OrderBy(n => n.DisplayName)
-                                         .OrderBy(e => e.Email)
-                                         .ToList();
-                return userList;
-            }
-            else if (!IsOwner(user) && IsAdmin(user))
-            {
-                var userList = new List<NuJournalUser>();
-                userList = _userManager.Users.Cast<NuJournalUser>()
-                                         .Where(u => !u.UserName.Equals(user.UserName))
-                                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
-                                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Administrator.ToString()))
-                                         .OrderBy(r => r.UserRoles)
-                                         .OrderBy(n => n.LastName)
-                                         .OrderBy(n => n.FirstName)
-                                         .OrderBy(n => n.DisplayName)
-                                         .OrderBy(e => e.Email)
-                                         .ToList();
-                return userList;
-            }
-            else return null;
-        }
-
-        public async Task<ProfilePicture> GetProfilePictureAsync(NuJournalUser user)
-        {
-            if (user is null) return null;
+            if (user == null) return null;
             else
             {
-                var profilePicture = _dbContext.ProfilePicture.FirstOrDefault(u => u.NuJournalUserId == user.Id);
+                var userList = new List<NuJournalUser>();
+                if (IsOwner(user))
+                {
+                    userList = _userManager.Users.Cast<NuJournalUser>()
+                         .Where(u => !u.UserName.Equals(user.UserName))
+                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                         .OrderBy(r => r.UserRoles)
+                         .OrderBy(n => n.LastName)
+                         .OrderBy(n => n.FirstName)
+                         .OrderBy(n => n.DisplayName)
+                         .OrderBy(e => e.Email)
+                         .ToList();
+                }
+                else if (!IsOwner(user) && IsAdmin(user))
+                {
+                    userList = _userManager.Users.Cast<NuJournalUser>()
+                         .Where(u => !u.UserName.Equals(user.UserName))
+                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Administrator.ToString()))
+                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
+                         .OrderBy(r => r.UserRoles)
+                         .OrderBy(n => n.LastName)
+                         .OrderBy(n => n.FirstName)
+                         .OrderBy(n => n.DisplayName)
+                         .OrderBy(e => e.Email)
+                         .ToList();
+                }
+                else return null;
+
+                if (userList.Count > 0) return userList;
+                else return null;
+            }
+        }
+
+        public async Task<ProfilePicture?> GetProfilePictureAsync(NuJournalUser user)
+        {
+            if (user == null) return null;
+            else
+            {
+                var profilePicture = _dbContext.ProfilePicture?.FirstOrDefault(u => u.NuJournalUserId == user.Id);
                 if (profilePicture != null) return profilePicture;
                 else return await GetDefaultProfilePictureAsync();
             }
         }
 
-        public async Task<bool> ChangeProfilePictureAsync(NuJournalUser user, IFormFile newUserProfilePictureFile)
+        public async Task<bool> ChangeProfilePictureAsync(NuJournalUser user, IFormFile newProfilePictureFile)
         {
-            if (user is null || newUserProfilePictureFile is null) return false;
+            if (user == null || newProfilePictureFile == null) return false;
             else
             {
-                var newUserProfilePicture = await _imageService.CreateCompressedImageAsync(newUserProfilePictureFile);
-                var oldUserProfilePicture = _dbContext.ProfilePicture.FirstOrDefault(u => u.NuJournalUserId == user.Id);
-                if (oldUserProfilePicture is null) return false;
+                var newUserProfilePicture = await _imageService.CreateCompressedImageAsync(newProfilePictureFile);
+                var oldUserProfilePicture = _dbContext.ProfilePicture?.FirstOrDefault(u => u.NuJournalUserId == user.Id);
+                if (newUserProfilePicture == null || oldUserProfilePicture == null) return false;
                 else
                 {
                     oldUserProfilePicture.CompressedImageData = newUserProfilePicture.CompressedImageData;
@@ -245,19 +301,16 @@ namespace NuJournalPro.Services
             }
         }
 
-        public async Task<bool> DeleteProfilePictureAsync(NuJournalUser user)
+        public bool DeleteProfilePicture(NuJournalUser user)
         {
             if (user is null) return false;
             else
             {
-                var defaultUserProfilePicture = await GetDefaultProfilePictureAsync();
-                var oldUserProfilePicture = _dbContext.ProfilePicture.FirstOrDefault(u => u.NuJournalUserId == user.Id);
-                if (oldUserProfilePicture is null) return false;
+                var userProfilePicture = _dbContext.ProfilePicture?.FirstOrDefault(u => u.NuJournalUserId == user.Id);
+                if (userProfilePicture == null) return false;
                 else
                 {
-                    oldUserProfilePicture.CompressedImageData = defaultUserProfilePicture.CompressedImageData;
-                    oldUserProfilePicture.ImageMimeType = defaultUserProfilePicture.ImageMimeType;
-                    oldUserProfilePicture.ImageSize = defaultUserProfilePicture.ImageSize;
+                    userProfilePicture = null;
                     if (_dbContext.SaveChanges() > 0) return true;
                     else return false;
                 }

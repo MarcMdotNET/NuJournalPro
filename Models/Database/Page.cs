@@ -1,5 +1,6 @@
 ﻿using NuJournalPro.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
 namespace NuJournalPro.Models.Database

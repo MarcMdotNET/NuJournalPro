@@ -8,7 +8,7 @@ namespace NuJournalPro.Services
     {
         public async Task<CompressedImage?> CreateCompressedImageAsync(IFormFile file)
         {
-            if (file is null) return null;
+            if (file == null) return null;
             else
             {
                 return new CompressedImage()
@@ -20,14 +20,14 @@ namespace NuJournalPro.Services
             }
         }
 
-        public async Task<CompressedImage?> CreateCompressedImageAsync(string fileName)
+        public async Task<CompressedImage?> CreateCompressedImageAsync(string fileName, string? alternatePath = null)
         {
-            if (fileName is null) return null;
+            if (fileName == null) return null;
             else
             {
                 return new CompressedImage()
                 {
-                    CompressedImageData = await EncodeImageDataAsync(fileName, true),
+                    CompressedImageData = await EncodeImageDataAsync(fileName, true, alternatePath),
                     ImageMimeType = GetImageMimeType(fileName),
                     ImageSize = GetImageSize(fileName)
                 };
@@ -36,41 +36,43 @@ namespace NuJournalPro.Services
 
         public async Task<byte[]?> EncodeImageDataAsync(IFormFile file, bool? compress = null)
         {
-            if (file is null) return null;
+            if (file == null) return null;
             else
             {
                 using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
-                if (compress is not null && compress is true) return CompressImageData(memoryStream.ToArray());
+                if (compress != null && compress == true) return CompressImageData(memoryStream.ToArray());
                 else return memoryStream.ToArray();
             }
         }
 
-        public async Task<byte[]?> EncodeImageDataAsync(string fileName, bool? compress = null)
+        public async Task<byte[]?> EncodeImageDataAsync(string fileName, bool? compress = null, string? alternatePath = null)
         {
-            if (fileName is null) return null;
+            if (fileName == null) return null;
             else
             {
-                var file = $"{Directory.GetCurrentDirectory()}/wwwresources/images/{fileName}";
+                string imagePath = "/appresources/images/";
+                if (alternatePath != null) imagePath = alternatePath;
+                var file = $"{Directory.GetCurrentDirectory()}{imagePath}{fileName}";
                 var fileContents = await File.ReadAllBytesAsync(file);
-                if (compress is not null && compress is true) return CompressImageData(fileContents);
+                if (compress != null && compress == true) return CompressImageData(fileContents);
                 else return fileContents;
             }
         }
         
         public string? DecodeImage(byte[]? imageData, string? mimeType, bool? decompress = null)
         {
-            if (imageData is null || mimeType is null) return null;
+            if (imageData == null || mimeType == null) return null;
             else
             {
-                if (decompress is not null && decompress is true) return $"data:{mimeType};base64,{Convert.ToBase64String(DecompressImageData(imageData))}";
+                if (decompress != null && decompress == true) return $"data:{mimeType};base64,{Convert.ToBase64String(DecompressImageData(imageData))}";
                 else return $"data:{mimeType};base64,{Convert.ToBase64String(imageData)}";
             }
         }
 
         public byte[]? CompressDecodedImage(string decodedImage)
         {
-            if (decodedImage is null) return null;
+            if (decodedImage == null) return null;
             else
             {
                 var imageData = Convert.FromBase64String(decodedImage);
@@ -80,7 +82,7 @@ namespace NuJournalPro.Services
 
         public string? DecompressDecodedImage(string decodedImage)
         {
-            if (decodedImage is null) return null;
+            if (decodedImage == null) return null;
             else
             {
                 var imageData = Convert.FromBase64String(decodedImage);
@@ -90,28 +92,35 @@ namespace NuJournalPro.Services
 
         public int GetImageSize(IFormFile file)
         {
-            if (file is null) return 0;
+            if (file == null) return 0;
             else return Convert.ToInt32(file?.Length);
         }
 
-        public int GetImageSize(string fileName)
+        public int GetImageSize(string fileName, string? alternatePath = null)
         {
-            if (fileName is null) return 0;
-            else return Convert.ToInt32(new FileInfo($"{Directory.GetCurrentDirectory()}/wwwresources/images/{fileName}").Length);
+            if (fileName == null) return 0;
+            else
+            {
+                string imagePath = "/appresources/images/";
+                if (alternatePath != null) imagePath = alternatePath;
+                return Convert.ToInt32(new FileInfo($"{Directory.GetCurrentDirectory()}{imagePath}{fileName}").Length);
+            }                
         }
 
         public string? GetImageMimeType(IFormFile file)
         {
-            if (file is null) return null;
+            if (file == null) return null;
             else return file.ContentType;
         }
 
-        public string? GetImageMimeType(string fileName)
+        public string? GetImageMimeType(string fileName, string? alternatePath = null)
         {
-            if (fileName is null) return null;
+            if (fileName == null) return null;
             else
             {
-                var file = $"{Directory.GetCurrentDirectory()}/wwwresources/images/{fileName}";
+                string imagePath = "/appresources/images/";
+                if (alternatePath != null) imagePath = alternatePath;
+                var file = $"{Directory.GetCurrentDirectory()}{imagePath}{fileName}";
                 var fileExtension = Path.GetExtension(file);
                 if (fileExtension == string.Empty)
                 {
