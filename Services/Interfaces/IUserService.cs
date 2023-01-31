@@ -23,5 +23,6 @@ namespace NuJournalPro.Services.Interfaces
         Task<bool> ChangeProfilePictureAsync(NuJournalUser user, IFormFile newProfilePictureFile);
         bool DeleteProfilePicture(NuJournalUser user);
         Task<bool> RemoveUserAccountAsync(NuJournalUser user);
+        public bool DeleteUserAccount(NuJournalUser user);
     }
 }

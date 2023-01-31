@@ -310,14 +310,29 @@ namespace NuJournalPro.Services
                 if (userProfilePicture == null) return false;
                 else
                 {
-                    userProfilePicture = null;
+                    _dbContext.ProfilePicture?.Remove(userProfilePicture);
                     if (_dbContext.SaveChanges() > 0) return true;
                     else return false;
                 }
             }
         }
 
-        public async Task<bool> RemoveUserAccountAsync(NuJournalUser user) // Needs fixing.
+        public bool DeleteUserAccount(NuJournalUser user)
+        {
+            if (user == null) return false;
+            else
+            {
+                // Remove any user roles from user.
+                foreach (var userRole in user.UserRoles.ToList())
+                {
+                    user.UserRoles.Remove(userRole);
+                }
+                user.UserRoles.Add(NuJournalUserRole.Deleted.ToString());
+                return true;
+            }
+        }
+        
+        public async Task<bool> RemoveUserAccountAsync(NuJournalUser user)
         {
             if (user == null) return false;
             else
