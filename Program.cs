@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NuJournalPro.Data;
 using NuJournalPro.Models.Database;
 using NuJournalPro.Models.Settings;
+using NuJournalPro.Services;
 using NuJournalPro.Services.Helpers;
 using NuJournalPro.Services.Interfaces;
 
@@ -30,6 +31,7 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("ContactUsSettings"));
 
 // Register custom services.
+builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<SetupDataService>();
 
