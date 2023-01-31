@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using NuJournalPro.Data;
 using NuJournalPro.Models.Database;
 using NuJournalPro.Models.Settings;
+using NuJournalPro.Services.Helpers;
+using NuJournalPro.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,9 +29,15 @@ builder.Services.Configure<DefaultGraphics>(builder.Configuration.GetSection("De
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("ContactUsSettings"));
 
-
+// Register custom services.
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddTransient<SetupDataService>();
 
 var app = builder.Build();
+
+// Get the database update with the latest migrations and create the Owner user if it doesn't already exist.
+var dataService = app.Services.CreateScope().ServiceProvider.GetRequiredService<SetupDataService>();
+await dataService.ManageDataAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
