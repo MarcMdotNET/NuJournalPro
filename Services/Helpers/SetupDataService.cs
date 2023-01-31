@@ -12,7 +12,7 @@ namespace NuJournalPro.Services.Helpers
         private readonly ApplicationDbContext _dbContext;
         private readonly UserManager<NuJournalUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ILogger<AddNewUserModel> _logger;
+        //private readonly ILogger<AddNewUserModel> _logger;
         private readonly IUserStore<NuJournalUser> _userStore;
         private readonly IUserEmailStore<NuJournalUser> _emailStore;
         private readonly OwnerSettings _ownerSettings;
@@ -22,7 +22,7 @@ namespace NuJournalPro.Services.Helpers
         public SetupDataService(ApplicationDbContext dbContext,
                                 UserManager<NuJournalUser> userManager,
                                 RoleManager<IdentityRole> roleManager,
-                                ILogger<AddNewUserModel> logger,
+                                //ILogger<AddNewUserModel> logger,
                                 IUserStore<NuJournalUser> userStore,                                
                                 OwnerSettings ownerSettings,
                                 IEmailSender emailSender,
@@ -31,7 +31,7 @@ namespace NuJournalPro.Services.Helpers
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
-            _logger = logger;
+            //_logger = logger;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _ownerSettings = ownerSettings;
