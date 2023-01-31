@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NuJournalPro.Data;
+using NuJournalPro.Models.Database;
+using NuJournalPro.Models.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetSection("pgsqlSettings")["pgsqlConnection"];
@@ -11,9 +12,22 @@ var connectionString = builder.Configuration.GetSection("pgsqlSettings")["pgsqlC
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<NuJournalUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddDefaultUI()
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+// Load custom configurations.
+builder.Services.Configure<OwnerSettings>(builder.Configuration.GetSection("OwnerSettings"));
+builder.Services.Configure<DefaultUserSettings>(builder.Configuration.GetSection("DefaultUserSettings"));
+builder.Services.Configure<DefaultGraphics>(builder.Configuration.GetSection("DefaultGraphics"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("ContactUsSettings"));
+
+
 
 var app = builder.Build();
 
