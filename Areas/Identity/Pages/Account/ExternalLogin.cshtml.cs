@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account
 {

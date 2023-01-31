@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Microsoft.Extensions.Hosting;
 using System.Reflection.Metadata;
+using NuJournalPro.Models.Database;
 
-namespace NuJournalPro.Models.Database
+namespace NuJournalPro.Models
 {
     public class NuJournalUser : IdentityUser
     {

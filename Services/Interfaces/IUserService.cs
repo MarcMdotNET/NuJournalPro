@@ -6,7 +6,7 @@ namespace NuJournalPro.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<NuJournalUser> CreateNewUserAsync(UserInputModel userModel, UserInfo? parentUserInfo = null, IFormFile? newUserProfilePictureFile = null);
+        Task<NuJournalUser> CreateNewUserAsync(UserInputModel userModel, UserInfo? parentUserInfo = null, IFormFile? userProfilePictureFile = null);
         Task<string> GetAccessDeniedImageAsync();
         Task<UserInfo> GetUserInfoAsync(NuJournalUser user);
         Task<ProfilePicture> GetDefaultProfilePictureAsync();

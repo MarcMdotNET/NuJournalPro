@@ -57,7 +57,7 @@ namespace NuJournalPro.Services
                 else return fileContents;
             }
         }
-
+        
         public string? DecodeImage(byte[]? imageData, string? mimeType, bool? decompress = null)
         {
             if (imageData is null || mimeType is null) return null;
