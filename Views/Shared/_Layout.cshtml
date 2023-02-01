@@ -4,46 +4,170 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NuJournalPro</title>
-    <link rel="stylesheet" href="~/lib/mdb/css/mdb.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/NuJournalPro.styles.css" asp-append-version="true" />
+    <link rel="shortcut icon" href="~/lib/sandbox/img/favicon.png" />
+    <link rel="stylesheet" href="~/lib/sandbox/css/plugins.css" />
+    <link rel="stylesheet" href="~/lib/sandbox/css/style.css" />
+    <link rel="stylesheet" href="~/lib/sandbox/css/colors/navy.css" />
+    <link rel="preload" href="~/lib/sandbox/css/fonts/urbanist.css" as="style" onload="this.rel='stylesheet'" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">NuJournalPro</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="content-wrapper">        
+        <header class="wrapper bg-gray">
+            <nav class="navbar navbar-expand-lg center-nav navbar-light navbar-bg-light">
+                <div class="container flex-lg-row flex-nowrap align-items-center">
+                    <div class="navbar-brand w-100">
+                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                            <img src="~/lib/sandbox/img/logo-dark.png" srcset="~/lib/sandbox/img/logo-dark@2x.png 2x" alt="" />
+                        </a>
+                    </div>
+                    <div class="navbar-collapse offcanvas offcanvas-nav offcanvas-start">
+                        <div class="offcanvas-header d-lg-none">
+                            <h3 class="text-white fs-30 mb-0">Sandbox</h3>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body ms-lg-auto d-flex flex-column h-100">
+                            <ul class="navbar-nav">
+                                <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                                <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                                <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                                <partial name="_LoginPartial" />
+                            </ul>
+                            <div class="offcanvas-footer d-lg-none">
+                                <div>
+                                    <a href="mailto:first.last@email.com" class="link-inverse">info@email.com</a>
+                                    <br /> 00 (123) 456 78 90 <br />
+                                    <nav class="nav social social-white mt-4">
+                                        <a href="#"><i class="uil uil-twitter"></i></a>
+                                        <a href="#"><i class="uil uil-facebook-f"></i></a>
+                                        <a href="#"><i class="uil uil-dribbble"></i></a>
+                                        <a href="#"><i class="uil uil-instagram"></i></a>
+                                        <a href="#"><i class="uil uil-youtube"></i></a>
+                                    </nav>                                    
+                                </div>
+                            </div>                            
+                        </div>                        
+                    </div>                    
+                    <div class="navbar-other w-100 d-flex ms-auto">
+                        <ul class="navbar-nav flex-row align-items-center ms-auto">
+                            <li class="nav-item">
+                                <nav class="nav social social-muted justify-content-end text-end">
+                                    <a href="#"><i class="uil uil-twitter"></i></a>
+                                    <a href="#"><i class="uil uil-facebook-f"></i></a>
+                                    <a href="#"><i class="uil uil-dribbble"></i></a>
+                                    <a href="#"><i class="uil uil-instagram"></i></a>
+                                </nav>                                
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <button class="hamburger offcanvas-nav-btn"><span></span></button>
+                            </li>
+                        </ul>                        
+                    </div>                    
+                </div>                
+            </nav>            
+        </header>        
+        @RenderBody()
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - NuJournalPro - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="bg-dark text-inverse">
+        <div class="container py-13 py-md-15">
+            <div class="row gy-6 gy-lg-0">
+                <div class="col-md-4 col-lg-3">
+                    <h4 class="widget-title text-white mb-3">Popular Posts</h4>
+                    <ul class="image-list">
+                        <li>
+                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a4.jpg" alt="" /></a></figure>
+                            <div class="post-content">
+                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Magna Mollis Ultricies</a> </h6>
+                                <ul class="post-meta">
+                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>26 Mar 2022</span></li>
+                                </ul>                                
+                            </div>
+                        </li>
+                        <li class="mt-5">
+                            <figure class="rounded"> <a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a5.jpg" alt="" /></a></figure>
+                            <div class="post-content">
+                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Ornare Nullam Risus</a> </h6>
+                                <ul class="post-meta">
+                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>16 Feb 2022</span></li>
+                                </ul>                                
+                            </div>
+                        </li>
+                        <li class="mt-5">
+                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a6.jpg" alt="" /></a></figure>
+                            <div class="post-content">
+                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Euismod Nullam Fusce</a> </h6>
+                                <ul class="post-meta">
+                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>8 Jan 2022</span></li>
+                                </ul>                                
+                            </div>
+                        </li>
+                    </ul>                    
+                </div>                
+                <div class="col-md-4 col-lg-3">
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Tags</h4>
+                        <ul class="list-unstyled tag-list">
+                            <li><a href="#" class="btn btn-soft-ash text-white  btn-sm rounded-pill">Still Life</a></li>
+                            <li><a href="#" class="btn btn-soft-ash text-white  btn-sm rounded-pill">Urban</a></li>
+                            <li><a href="#" class="btn btn-soft-ash text-white  btn-sm rounded-pill">Nature</a></li>
+                            <li><a href="#" class="btn btn-soft-ash text-white  btn-sm rounded-pill">Landscape</a></li>
+                        </ul>
+                    </div>                    
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Categories</h4>
+                        <ul class="unordered-list text-reset bullet-white ">
+                            <li><a href="#">Lifestyle (21)</a></li>
+                            <li><a href="#">Photography (19)</a></li>
+                            <li><a href="#">Journal (16)</a></li>
+                        </ul>
+                    </div>                    
+                </div>                
+                <div class="col-md-4 col-lg-3">
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Get in Touch</h4>
+                        <address class="pe-xl-15 pe-xxl-17">Moonshine St. 14/05 Light City, London, United Kingdom</address>
+                        <a href="mailto:#">info@email.com</a><br /> 00 (123) 456 78 90
+                    </div>                    
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Elsewhere</h4>
+                        <nav class="nav social social-white">
+                            <a href="#"><i class="uil uil-twitter"></i></a>
+                            <a href="#"><i class="uil uil-facebook-f"></i></a>
+                            <a href="#"><i class="uil uil-dribbble"></i></a>
+                            <a href="#"><i class="uil uil-instagram"></i></a>
+                            <a href="#"><i class="uil uil-youtube"></i></a>
+                        </nav>                        
+                    </div>                    
+                </div>                
+                <div class="col-md-4 col-lg-3">
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Learn More</h4>
+                        <ul class="list-unstyled text-reset mb-0">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Our Story</a></li>
+                            <li><a href="#">Projects</a></li>
+                        </ul>
+                    </div>                    
+                    <div class="widget">
+                        <h4 class="widget-title text-white mb-3">Need Help?</h4>
+                        <ul class="list-unstyled text-reset mb-0">
+                            <li><a href="#">Support</a></li>
+                            <li><a href="#">Get Started</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>                    
+                </div>                
+            </div>            
+            <p class="mt-6 mb-0 text-center">© 2023 NuJournalPro. All rights reserved.</p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/mdb/js/mdb.min.js"></script>
+    <div class="progress-wrap">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+        </svg>
+    </div>
+    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
+    <script src="~/lib/sandbox/js/plugins.js"></script>
+    <script src="~/lib/sandbox/js/theme.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
