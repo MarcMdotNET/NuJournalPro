@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NuJournalPro.Data;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 using NuJournalPro.Models.Settings;
 using NuJournalPro.Services;
 using NuJournalPro.Services.Helpers;
@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetSection("pgsqlSettings")["pgsqlConnection"];
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<NuJournalUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using NuJournalPro.Areas.Identity.Pages.Account;
 using NuJournalPro.Data;
 using NuJournalPro.Enums;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 using NuJournalPro.Models.Settings;
 using NuJournalPro.Services.Interfaces;
 

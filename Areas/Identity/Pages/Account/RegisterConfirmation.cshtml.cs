@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account
 {
@@ -26,7 +26,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             _userManager = userManager;
             _sender = sender;
         }
-        
+
         public string Email { get; set; }
 
         public bool DisplayConfirmAccountLink { get; set; }

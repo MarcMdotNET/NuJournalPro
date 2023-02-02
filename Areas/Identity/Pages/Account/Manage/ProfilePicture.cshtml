@@ -1,4 +1,45 @@
 ﻿@page
-@model NuJournalPro.Areas.Identity.Pages.Account.Manage.ProfilePictureModel
+@model ProfilePictureModel
+@using NuJournalPro.Services.Interfaces
+
+@inject IImageService ImageService
+
 @{
+    ViewData["Title"] = Model.UserInfo.FullNameMiddleInitial + " (" + Model.UserInfo.DisplayName + ")";
+    ViewData["ActivePage"] = ManageNavPages.ProfilePicture;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="profile-picture-form" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="square-img-container">
+                        <img id="contactImage" class="square-img" src="@Model.UserInfo.ProfilePicture?.DecodedImage" alt="Profile Picture" />
+                    </div>
+                    <div class="mt-4">
+                        <label asp-for="ProfilePictureFile" class="control-label" class="form-label">Select a profile picture for @Model.UserInfo.UserName</label>
+                        <input type="file" asp-for="ProfilePictureFile" class="form-control" accept=".jpg,.jpeg,.svg,.png,.gif" onchange="document.getElementById('contactImage').src=window.URL.createObjectURL(this.files[0])" />
+                        <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
+                    </div>
+                    <div class="mt-4">
+                        <div class="form-check">
+                            <input asp-for="DeleteProfilePictureCheckbox" class="form-check-input" />
+                            <label asp-for="DeleteProfilePictureCheckbox">Delete profile picture</label>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button id="update-profile-picture-button" type="submit" class="w-100 btn btn-lg btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

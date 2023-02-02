@@ -1,6 +1,8 @@
-﻿using NuJournalPro.Models.Media;
+﻿using NuJournalPro.Models.Database;
+using NuJournalPro.Models.Media;
 using NuJournalPro.Services.Interfaces;
 using System.IO.Compression;
+using System.Text;
 
 namespace NuJournalPro.Services
 {
@@ -8,7 +10,10 @@ namespace NuJournalPro.Services
     {
         public async Task<CompressedImage?> CreateCompressedImageAsync(IFormFile file)
         {
-            if (file == null) return null;
+            if (file == null)
+            {
+                return null;
+            }                
             else
             {
                 return new CompressedImage()
@@ -20,136 +25,237 @@ namespace NuJournalPro.Services
             }
         }
 
-        public async Task<CompressedImage?> CreateCompressedImageAsync(string fileName, string? alternatePath = null)
+        public async Task<CompressedImage?> CreateCompressedImageAsync(string fileName, string filePath)
         {
-            if (fileName == null) return null;
-            else
+            if (fileName == null || filePath == null)
             {
-                return new CompressedImage()
+                return null;
+            }            
+            else
+            {                
+                if (File.Exists($"{Directory.GetCurrentDirectory()}{filePath}{fileName}")) {
+                    return new CompressedImage()
+                    {
+                        CompressedImageData = await EncodeImageDataAsync(fileName, filePath, true),
+                        ImageMimeType = GetImageMimeType(fileName, filePath),
+                        ImageSize = GetImageSize(fileName, filePath)
+                    };
+                }
+                else
                 {
-                    CompressedImageData = await EncodeImageDataAsync(fileName, true, alternatePath),
-                    ImageMimeType = GetImageMimeType(fileName),
-                    ImageSize = GetImageSize(fileName)
-                };
+                    return null;
+                }
             }
         }
 
         public async Task<byte[]?> EncodeImageDataAsync(IFormFile file, bool? compress = null)
         {
-            if (file == null) return null;
+            if (file == null)
+            {
+                return null;
+            }
             else
             {
                 using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
-                if (compress != null && compress == true) return CompressImageData(memoryStream.ToArray());
-                else return memoryStream.ToArray();
+                if (compress != null && compress == true)
+                {
+                    return CompressImageData(memoryStream.ToArray());
+                }
+                else
+                {
+                    return memoryStream.ToArray();
+                }
             }
         }
 
-        public async Task<byte[]?> EncodeImageDataAsync(string fileName, bool? compress = null, string? alternatePath = null)
+        public async Task<byte[]?> EncodeImageDataAsync(string fileName, string filePath, bool? compress = null)
         {
-            if (fileName == null) return null;
+            if (fileName == null || filePath == null)
+            {
+                return null;
+            }
             else
             {
-                string imagePath = "/appresources/images/";
-                if (alternatePath != null) imagePath = alternatePath;
-                var file = $"{Directory.GetCurrentDirectory()}{imagePath}{fileName}";
-                var fileContents = await File.ReadAllBytesAsync(file);
-                if (compress != null && compress == true) return CompressImageData(fileContents);
-                else return fileContents;
+                var file = $"{Directory.GetCurrentDirectory()}{filePath}{fileName}";
+
+                if (File.Exists(file))
+                {
+                    var fileContents = await File.ReadAllBytesAsync(file);
+                    if (compress != null && compress == true)
+                    {
+                        return CompressImageData(fileContents);
+                    }
+                    else
+                    {
+                        return fileContents;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
-        
+
         public string? DecodeImage(byte[]? imageData, string? mimeType, bool? decompress = null)
         {
-            if (imageData == null || mimeType == null) return null;
+            if (imageData == null || mimeType == null)
+            {
+                return null;
+            }
             else
             {
-                if (decompress != null && decompress == true) return $"data:{mimeType};base64,{Convert.ToBase64String(DecompressImageData(imageData))}";
-                else return $"data:{mimeType};base64,{Convert.ToBase64String(imageData)}";
+                if (decompress != null && decompress == true)
+                {
+                    return $"data:{mimeType};base64,{Convert.ToBase64String(DecompressImageData(imageData))}";
+                }
+                else
+                {
+                    return $"data:{mimeType};base64,{Convert.ToBase64String(imageData)}";
+                }
             }
         }
 
-        public byte[]? CompressDecodedImage(string decodedImage)
+        public byte[] CompressDecodedImage(string decodedImage)
         {
-            if (decodedImage == null) return null;
-            else
+            if (decodedImage == null)
             {
-                var imageData = Convert.FromBase64String(decodedImage);
-                return CompressImageData(imageData);
+                throw new ArgumentNullException(nameof(decodedImage));
+            }
+            else
+            {                
+                var byteData = Encoding.ASCII.GetBytes(decodedImage);
+                return CompressImageData(byteData);
             }
         }
 
-        public string? DecompressDecodedImage(string decodedImage)
+        public string DecompressDecodedImage(byte[] compressedDecodedImage)
         {
-            if (decodedImage == null) return null;
+            if (compressedDecodedImage == null)
+            {
+                throw new ArgumentNullException(nameof(compressedDecodedImage));
+            }
             else
             {
-                var imageData = Convert.FromBase64String(decodedImage);
-                return Convert.ToBase64String(DecompressImageData(imageData));
+                var byteData = DecompressImageData(compressedDecodedImage);
+                return Encoding.ASCII.GetString(byteData);
+            }
+        }
+
+        public string CompressDecodedImageB64(string decodedImage)
+        {
+            if (decodedImage == null)
+            {
+                throw new ArgumentNullException(nameof(decodedImage));
+            }
+            else
+            {
+                return Convert.ToBase64String(CompressDecodedImage(decodedImage));
+            }
+        }
+
+        public string DecompressDecodedImageB64(string compressedDecodedImageB64)
+        {
+            if (compressedDecodedImageB64 == null)
+            {
+                throw new ArgumentNullException(nameof(compressedDecodedImageB64));
+            }
+            else
+            {
+                return DecompressDecodedImage(Convert.FromBase64String(compressedDecodedImageB64));
             }
         }
 
         public int GetImageSize(IFormFile file)
         {
-            if (file == null) return 0;
-            else return Convert.ToInt32(file?.Length);
-        }
-
-        public int GetImageSize(string fileName, string? alternatePath = null)
-        {
-            if (fileName == null) return 0;
+            if (file == null)
+            {
+                return 0;
+            }
             else
             {
-                string imagePath = "/appresources/images/";
-                if (alternatePath != null) imagePath = alternatePath;
-                return Convert.ToInt32(new FileInfo($"{Directory.GetCurrentDirectory()}{imagePath}{fileName}").Length);
-            }                
+                return Convert.ToInt32(file?.Length);
+            }
+        }
+
+        public int GetImageSize(string fileName, string filePath)
+        {
+            if (fileName == null || filePath == null)
+            {
+                return 0;
+            }
+            else
+            {
+                if (File.Exists($"{Directory.GetCurrentDirectory()}{filePath}{fileName}"))
+                {
+                    return Convert.ToInt32(new FileInfo($"{Directory.GetCurrentDirectory()}{filePath}{fileName}").Length);
+                }
+                else
+                {
+                    return 0;
+                }                
+            }
         }
 
         public string? GetImageMimeType(IFormFile file)
         {
-            if (file == null) return null;
-            else return file.ContentType;
-        }
-
-        public string? GetImageMimeType(string fileName, string? alternatePath = null)
-        {
-            if (fileName == null) return null;
+            if (file == null)
+            {
+                return null;
+            }
             else
             {
-                string imagePath = "/appresources/images/";
-                if (alternatePath != null) imagePath = alternatePath;
-                var file = $"{Directory.GetCurrentDirectory()}{imagePath}{fileName}";
-                var fileExtension = Path.GetExtension(file);
-                if (fileExtension == string.Empty)
+                return file.ContentType;
+            }
+        }
+
+        public string? GetImageMimeType(string fileName, string filePath)
+        {
+            if (fileName == null || filePath == null)
+            {
+                return null;
+            }
+            else
+            {
+                var file = $"{Directory.GetCurrentDirectory()}{filePath}{fileName}";
+                
+                if (File.Exists(file))
                 {
-                    return null;
+                    var fileExtension = Path.GetExtension(file);
+                    if (fileExtension == string.Empty)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (fileExtension == ".svg")
+                        {
+                            return "image/svg+xml";
+                        }
+                        else if (fileExtension == ".png")
+                        {
+                            return "image/png";
+                        }
+                        else if (fileExtension == ".jpg" || fileExtension == ".jpeg")
+                        {
+                            return "image/jpeg";
+                        }
+                        else if (fileExtension == ".gif")
+                        {
+                            return "image/gif";
+                        }
+                        else if (fileExtension == ".bmp")
+                        {
+                            return "image/bmp";
+                        }
+                        else return null;
+                    }
                 }
                 else
                 {
-                    if (fileExtension == ".svg")
-                    {
-                        return "image/svg+xml";
-                    }
-                    else if (fileExtension == ".png")
-                    {
-                        return "image/png";
-                    }
-                    else if (fileExtension == ".jpg" || fileExtension == ".jpeg")
-                    {
-                        return "image/jpeg";
-                    }
-                    else if (fileExtension == ".gif")
-                    {
-                        return "image/gif";
-                    }
-                    else if (fileExtension == ".bmp")
-                    {
-                        return "image/bmp";
-                    }
-                    else return null;
-                }
+                    return null; 
+                }                              
             }
         }
 

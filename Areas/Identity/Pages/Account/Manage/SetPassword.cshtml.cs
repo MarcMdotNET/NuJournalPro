@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 {

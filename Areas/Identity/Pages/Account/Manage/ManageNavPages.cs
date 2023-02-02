@@ -10,8 +10,9 @@ namespace  NuJournalPro.Areas.Identity.Pages.Account.Manage
     public static class ManageNavPages
     {
         public static string OwnerPanel => "OwnerPanel";
-        
+
         public static string AdminPanel => "AdminPanel";
+        
         public static string Index => "Index";
 
         public static string SocialMedia => "SocialMedia";

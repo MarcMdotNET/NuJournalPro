@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NuJournalPro.Models;
 using NuJournalPro.Models.Database;
 
 namespace NuJournalPro.Data

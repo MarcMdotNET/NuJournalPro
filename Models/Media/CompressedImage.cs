@@ -13,11 +13,14 @@ namespace NuJournalPro.Models.Media
         {
             get
             {
-                if (CompressedImageData is not null)
+                if (CompressedImageData != null)
                 {
                     return DecompressImageData(CompressedImageData);
                 }
-                else return null;
+                else
+                {
+                    return null;
+                }                    
             }
         }
 
@@ -26,13 +29,17 @@ namespace NuJournalPro.Models.Media
         {
             get
             {
-                if (ImageData is not null && ImageMimeType is not null)
+                if (ImageData != null && ImageMimeType != null)
                 {
                     return $"data:{ImageMimeType};base64,{Convert.ToBase64String(ImageData)}";
                 }
-                else return null;
+                else
+                {
+                    return null;
+                }
             }
         }
+        
         public int ImageSize { get; set; }
 
         [NotMapped]
@@ -40,8 +47,14 @@ namespace NuJournalPro.Models.Media
         {
             get
             {
-                if (CompressedImageData is not null && ImageMimeType is not null) return CompressedImageData.Length + ImageMimeType.ToArray().Length;
-                else return 0;
+                if (CompressedImageData != null)
+                {
+                    return CompressedImageData.Length;
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 

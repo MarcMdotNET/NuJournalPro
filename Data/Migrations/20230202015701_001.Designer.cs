@@ -13,7 +13,7 @@ using NuJournalPro.Data;
 namespace NuJournalPro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230201004100_001")]
+    [Migration("20230202015701_001")]
     partial class _001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -279,137 +279,6 @@ namespace NuJournalPro.Data.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("NuJournalPro.Models.Database.NuJournalUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<List<string>>("CreatedByRoles")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
-                    b.Property<string>("CreatedByUser")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FacebookUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("GitHubUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("InstagramUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime>("Joined")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("LinkedInUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("MiddleName")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<List<string>>("ModifiedByRoles")
-                        .HasColumnType("text[]");
-
-                    b.Property<string>("ModifiedByUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TwitterUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<List<string>>("UserRoles")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
-                    b.Property<string>("YouTubeUrl")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("NuJournalPro.Models.Database.Page", b =>
                 {
                     b.Property<int>("Id")
@@ -631,6 +500,137 @@ namespace NuJournalPro.Data.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("NuJournalPro.Models.NuJournalUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("CreatedByRoles")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("CreatedByUser")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("GitHubUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("Joined")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<List<string>>("ModifiedByRoles")
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("ModifiedByUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TwitterUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<List<string>>("UserRoles")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("YouTubeUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -642,7 +642,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", null)
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -651,7 +651,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", null)
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -666,7 +666,7 @@ namespace NuJournalPro.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", null)
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -675,7 +675,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", null)
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -684,7 +684,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.Blog", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany("Blogs")
                         .HasForeignKey("NuJournalUserId");
 
@@ -699,7 +699,7 @@ namespace NuJournalPro.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany()
                         .HasForeignKey("NuJournalUserId");
 
@@ -710,11 +710,11 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.Comment", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "ModeratorUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "ModeratorUser")
                         .WithMany()
                         .HasForeignKey("ModeratorUserId");
 
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany()
                         .HasForeignKey("NuJournalUserId");
 
@@ -733,7 +733,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.Page", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany("Pages")
                         .HasForeignKey("NuJournalUserId");
 
@@ -742,7 +742,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.PageImage", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany()
                         .HasForeignKey("NuJournalUserId");
 
@@ -765,7 +765,7 @@ namespace NuJournalPro.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany("Posts")
                         .HasForeignKey("NuJournalUserId");
 
@@ -776,7 +776,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.PostImage", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany()
                         .HasForeignKey("NuJournalUserId");
 
@@ -793,7 +793,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.ProfilePicture", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithOne("ProfilePicture")
                         .HasForeignKey("NuJournalPro.Models.Database.ProfilePicture", "NuJournalUserId");
 
@@ -802,7 +802,7 @@ namespace NuJournalPro.Data.Migrations
 
             modelBuilder.Entity("NuJournalPro.Models.Database.Tag", b =>
                 {
-                    b.HasOne("NuJournalPro.Models.Database.NuJournalUser", "NuJournalUser")
+                    b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithMany()
                         .HasForeignKey("NuJournalUserId");
 
@@ -824,17 +824,6 @@ namespace NuJournalPro.Data.Migrations
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("NuJournalPro.Models.Database.NuJournalUser", b =>
-                {
-                    b.Navigation("Blogs");
-
-                    b.Navigation("Pages");
-
-                    b.Navigation("Posts");
-
-                    b.Navigation("ProfilePicture");
-                });
-
             modelBuilder.Entity("NuJournalPro.Models.Database.Page", b =>
                 {
                     b.Navigation("PageImage");
@@ -847,6 +836,17 @@ namespace NuJournalPro.Data.Migrations
                     b.Navigation("PostImage");
 
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("NuJournalPro.Models.NuJournalUser", b =>
+                {
+                    b.Navigation("Blogs");
+
+                    b.Navigation("Pages");
+
+                    b.Navigation("Posts");
+
+                    b.Navigation("ProfilePicture");
                 });
 #pragma warning restore 612, 618
         }

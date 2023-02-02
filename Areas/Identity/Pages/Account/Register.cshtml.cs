@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuJournalPro.Enums;
-using NuJournalPro.Models.Database;
+using NuJournalPro.Models;
 using NuJournalPro.Models.Identity;
 using NuJournalPro.Models.Settings;
 using NuJournalPro.Services.Interfaces;
@@ -54,7 +54,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _defaultUserSettings = defaultUserSettings.Value;
-            _userService = userService;            
+            _userService = userService;
         }
 
         [BindProperty]
@@ -72,7 +72,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             [Display(Name = "Password")]
             public new string Password { get; set; }
         }
-
+        
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -86,8 +86,6 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
                 if (_userService.IsDisplayNameForbidden(Input.DisplayName))
                 {
                     ModelState.AddModelError("Input.DisplayName", $"The public display name {Input.DisplayName} is not allowed.");
@@ -106,6 +104,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
                     ModelState.AddModelError("Input.DisplayName", $"A similar public display name to {Input.DisplayName} already exists.");
                     return Page();
                 }
+                
+                var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -117,7 +117,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
                     user.UserRoles.Add(NuJournalUserRole.Reader.ToString());
                 }
                 else
-                {                    
+                {
                     foreach (var userRole in Enum.GetNames(typeof(NuJournalUserRole)))
                     {
                         if (userRole == defaultUserRole)
@@ -131,7 +131,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
                 {
                     user.UserRoles.Add(NuJournalUserRole.Reader.ToString());
                 }
-                
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
