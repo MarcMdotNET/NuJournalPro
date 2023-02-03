@@ -10,20 +10,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NuJournalPro.Models;
+using NuJournalPro.Models.Identity;
+using NuJournalPro.Services.Interfaces;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 {
-    public class IndexModel : PageModel
+    public class PersonalProfileModel : PageModel
     {
         private readonly UserManager<NuJournalUser> _userManager;
         private readonly SignInManager<NuJournalUser> _signInManager;
+        private readonly ILogger<PersonalProfileModel> _logger;
+        private readonly IUserService _userService;
 
-        public IndexModel(
+        public PersonalProfileModel(
             UserManager<NuJournalUser> userManager,
-            SignInManager<NuJournalUser> signInManager)
+            SignInManager<NuJournalUser> signInManager,
+            ILogger<PersonalProfileModel> logger,
+            IUserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
+            _userService = userService;            
         }
 
         public string Username { get; set; }
@@ -32,58 +40,51 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public string StatusMessage { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public UserInfo UserInfo { get; set; }        
 
-        public class InputModel
-        {
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
-
-        private async Task LoadAsync(NuJournalUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
+        public IFormFile ProfilePictureFile { get; set; }
+        
+        public bool DeleteProfilePictureCheckbox { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
+            StatusMessage = string.Empty;
+            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            UserInfo = await _userService.GetUserInfoAsync(user);
+
             return Page();
         }
-
-        public async Task<IActionResult> OnPostAsync()
+        
+        public async Task<IActionResult> OnPostSaveProfileChangesAsync()
         {
+            StatusMessage = string.Empty;
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+
+            
+            
+
 
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
+                UserInfo = await _userService.GetUserInfoAsync(user);
                 return Page();
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            if (UserInfo.PhoneNumber != phoneNumber)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, UserInfo.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
@@ -94,6 +95,68 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostUpdateProfilePictureAsync(IFormFile profilePictureFile, bool deleteProfilePictureCheckbox)
+        {
+            StatusMessage = string.Empty;
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                StatusMessage = "Error: Your profile picture was not updated.";
+            }
+            else
+            {
+                if (deleteProfilePictureCheckbox)
+                {
+                    if (!_userService.DeleteProfilePicture(user))
+                    {
+                        ModelState.AddModelError("ProfilePictureFile", "Error: Unable to delete the user's avatar.");
+                    }
+                    else
+                    {
+                        StatusMessage = "Your profile picture has been deleted.";
+                    }
+                }
+                else if (profilePictureFile != null)
+                {
+                    if (!await _userService.ChangeProfilePictureAsync(user, profilePictureFile))
+                    {
+                        StatusMessage = "Error: Unable to change your profile picture.";
+                    }
+                    else
+                    {
+                        StatusMessage = "Your profile picture has been updated";
+                    }
+                }
+                else
+                {
+                    StatusMessage = "Error: Your profile picture was not updated.";
+                    UserInfo = await _userService.GetUserInfoAsync(user);
+                    return Page();
+                }
+
+                user.ModifiedByUser = user.UserName;
+                user.ModifiedByRoles = user.UserRoles;
+                user.Modified = DateTime.UtcNow;
+                var userUpdateResult = await _userManager.UpdateAsync(user);
+
+                if (!userUpdateResult.Succeeded)
+                {
+                    var profilePictureUpdateFailed = $"Error: Due to error {userUpdateResult.Errors.FirstOrDefault().Code}, your profile picture was not updated.";
+                    StatusMessage = profilePictureUpdateFailed;
+                    _logger.LogError(profilePictureUpdateFailed);
+                }
+            }
+
+            UserInfo = await _userService.GetUserInfoAsync(user);
+            return Page();
         }
     }
 }
