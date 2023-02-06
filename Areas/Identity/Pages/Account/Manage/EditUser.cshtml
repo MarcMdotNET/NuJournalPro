@@ -1,4 +1,191 @@
 ﻿@page
-@model NuJournalPro.Areas.Identity.Pages.Account.Manage.EditUserModel
+@model EditUserModel
+
 @{
+    var isOwner = User.IsInRole("Owner");
+    var isAdmin = User.IsInRole("Administrator");
+    if (isOwner || isAdmin)
+    {
+        ViewData["Title"] = "Edit Existing User Account";
+        if (isOwner) ViewData["ActivePage"] = ManageNavPages.OwnerPanel;
+        else
+        if (isAdmin) ViewData["ActivePage"] = ManageNavPages.AdminPanel;
+        else ViewData["ActivePage"] = ManageNavPages.Index;
+
+        <h3>@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+        <div class="row">
+            <div class="col-lg-12">
+                @if (ViewData["SelectUserList"] != null)
+                {
+                    <form asp-page-handler="SelectUser" id="select-user-form" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="form-floating">
+                                            <div class="form-select-wrapper mb-4">
+                                                <label asp-for="SelectedUserEmail" class="control-label"></label>
+                                                <select asp-for="SelectedUserEmail" class="form-select" asp-items="ViewBag.SelectUserList"></select>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 text-center">
+                                            <button id="load-user-button" type="submit" class="btn btn-lg btn-primary">Select User Account</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="alert alert-danger alert-icon mt-4" role="alert">
+                                        <i class="uil uil-lock"></i> There are no user accounts that are available for editing.
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Model.UserFormVisibility is true)
+            {
+                <div class="col-lg-12 mt-4">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <a class="collapse-link stretched-link collapsed" data-bs-toggle="collapse" href="#collapse-1" aria-expanded="false">Account history</a>
+                                    <div id="collapse-1" class="card-footer p-0 accordion-collapse collapse" style="">
+                                        <ul class="unordered-list bullet-primary">
+                                            <li><b>Account created on:</b> @Model.SelectedUserInput.Joined.ToString()</li>
+                                            <li><b>Account created by user:</b> @Model.SelectedUserInput.CreatedByUser</li>
+                                            <li><b>Account created by user role(s):</b> @Model.SelectedUserInput.CreatedByRolesString</li>
+                                            @if (!Model.SelectedUserInput.Modified.Equals(Model.SelectedUserInput.Joined))
+                                            {
+                                                <li><b>Account last updated on:</b> @Model.SelectedUserInput.Modified.ToString()</li>
+                                            }
+                                            @if (Model.SelectedUserInput.ModifiedByUser is not null)
+                                            {
+                                                <li><b>Account last updated by user:</b> @Model.SelectedUserInput.ModifiedByUser</li>
+                                            }
+                                            @if (Model.SelectedUserInput.ModifiedByRolesString is not null)
+                                            {
+                                                <li><b>Account last update by user role(s):</b> @Model.SelectedUserInput.ModifiedByRolesString</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 mt-4">
+                    <form asp-page-handler="ModifyUser" id="edit-user-form" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Account Details</h5>
+                                        <div class="form-floating">
+                                            <input asp-for="SelectedUserInput.Email" class="form-control" onchange="document.getElementById('username-email-label').textContent='Select a profile picture for user: ' + this.value" />
+                                            <label asp-for="SelectedUserInput.Email" class="form-label"></label>
+                                        </div>
+                                        <div class="form-floating mt-3">
+                                            <input asp-for="SelectedUserInput.FirstName" class="form-control" />
+                                            <label asp-for="SelectedUserInput.FirstName" class="form-label"></label>
+                                            <span asp-validation-for="SelectedUserInput.FirstName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-2">
+                                            <input asp-for="SelectedUserInput.MiddleName" class="form-control" />
+                                            <label asp-for="SelectedUserInput.MiddleName" class="form-label"></label>
+                                            <span asp-validation-for="SelectedUserInput.MiddleName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-2">
+                                            <input asp-for="SelectedUserInput.LastName" class="form-control" />
+                                            <label asp-for="SelectedUserInput.LastName" class="form-label"></label>
+                                            <span asp-validation-for="SelectedUserInput.LastName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-3">
+                                            <input asp-for="SelectedUserInput.DisplayName" class="form-control" />
+                                            <label asp-for="SelectedUserInput.DisplayName" class="form-label"></label>
+                                            <span asp-validation-for="SelectedUserInput.DisplayName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-3">
+                                            <input asp-for="SelectedUserInput.PhoneNumber" class="form-control" />
+                                            <label asp-for="SelectedUserInput.PhoneNumber" class="form-label"></label>
+                                            <span asp-validation-for="SelectedUserInput.PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-2">
+                                            <input asp-for="SelectedUserInput.Password" class="form-control" autocomplete="new-password" aria-required="true" />
+                                            <label asp-for="SelectedUserInput.Password"></label>
+                                            <span asp-validation-for="SelectedUserInput.Password" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mt-2">
+                                            <input asp-for="SelectedUserInput.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                                            <label asp-for="SelectedUserInput.ConfirmPassword"></label>
+                                            <span asp-validation-for="SelectedUserInput.ConfirmPassword" class="text-danger"></span>
+                                        </div>
+                                        @if (ViewData["UserRolesList"] != null)
+                                        {
+                                            <div class="form-floating">
+                                                <div class="form-select-wrapper mt-2">
+                                                    <label asp-for="SelectedUserRole" class="control-label"></label>
+                                                    <select asp-for="SelectedUserRole" class="form-select" asp-items="ViewBag.UserRolesList"></select>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Profile Picture</h5>
+                                        <div class="square-img-container">
+                                            <img id="contactImage" class="square-img" src="@Model.SelectedUserInput.ProfilePicture.DecodedImage" alt="Profile Picture" />
+                                        </div>
+                                        <div class="mt-4">
+                                            <label asp-for="SelectedUserInput.ImageFile" class="control-label" class="form-label">Select a profile picture for @Model.SelectedUserInput.Email</label>
+                                            <input type="file" asp-for="SelectedUserInput.ImageFile" class="form-control" accept=".jpg,.jpeg,.svg,.png,.gif" onchange="document.getElementById('contactImage').src=window.URL.createObjectURL(this.files[0])" />
+                                            <span asp-validation-for="SelectedUserInput.ImageFile" class="text-danger"></span>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="form-check">
+                                                <input asp-for="DeleteProfilePictureCheckbox" class="form-check-input" />
+                                                <label asp-for="DeleteProfilePictureCheckbox">Delete profile picture</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <button id="edit-user-button" type="submit" class="btn btn-lg btn-primary">Modify User Account</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        ViewData["Title"] = "Access Denied";
+        ViewData["ActivePage"] = ManageNavPages.Index;
+        <h3>@ViewData["Title"]</h3>
+        <div class="row">
+            <div class="col-lg-12">
+                <partial name="_StatusMessage" for="StatusMessage" />
+                <div class="any-img-container-half-height">
+                    <img id="accessDeniedImage" class="any-img-half-height" src="@Model.AccessDeniedImage" alt="Access Denied" />
+                </div>
+            </div>
+        </div>
+    }
 }

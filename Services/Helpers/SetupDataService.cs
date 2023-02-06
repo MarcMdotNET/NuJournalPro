@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿#nullable disable
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,7 +18,7 @@ namespace NuJournalPro.Services.Helpers
         private readonly ApplicationDbContext _dbContext;
         private readonly UserManager<NuJournalUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ILogger<RegisterModel> _logger;
+        private readonly ILogger<SetupDataService> _logger;
         private readonly IUserStore<NuJournalUser> _userStore;
         private readonly IUserEmailStore<NuJournalUser> _emailStore;
         private readonly OwnerSettings _ownerSettings;
@@ -26,7 +28,7 @@ namespace NuJournalPro.Services.Helpers
         public SetupDataService(ApplicationDbContext dbContext,
                                 UserManager<NuJournalUser> userManager,
                                 RoleManager<IdentityRole> roleManager,
-                                ILogger<RegisterModel> logger,
+                                ILogger<SetupDataService> logger,
                                 IUserStore<NuJournalUser> userStore,                                
                                 IOptions<OwnerSettings> ownerSettings,
                                 IEmailSender emailSender,

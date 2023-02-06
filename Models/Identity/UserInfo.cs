@@ -17,7 +17,7 @@ namespace NuJournalPro.Models.Identity
         public string? FirstName { get; set; }
 
         [Display(Name = "Middle Name")]
-        [StringLength(128, ErrorMessage = "The {0} ust be at least {2} and no more than {1} characters long.", MinimumLength = 2)]        
+        [StringLength(128, ErrorMessage = "The {0} ust be at least {2} and no more than {1} characters long.", MinimumLength = 1)]        
         public string? MiddleName { get; set; }
 
         [Display(Name = "Last Name")]
@@ -34,7 +34,7 @@ namespace NuJournalPro.Models.Identity
         public string? DisplayName { get; set; }        
         
         [Phone]
-        [Display(Name = "Phone Number")]
+        [Display(Name = "Phone Number (use \"x\" to add extension)")]
         public string? PhoneNumber { get; set; }
         
         [Display(Name = "Profile Picture")]

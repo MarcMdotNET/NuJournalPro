@@ -86,26 +86,15 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                if (_userService.IsDisplayNameForbidden(Input.DisplayName))
-                {
-                    ModelState.AddModelError("Input.DisplayName", $"The public display name {Input.DisplayName} is not allowed.");
-                    return Page();
-                }
+                var verifyDisplayNameResult = _userService.VerifyDisplayName(Input.DisplayName);
 
-
-                if (!_userService.IsDisplayNameUnique(Input.DisplayName))
+                if (verifyDisplayNameResult != string.Empty)
                 {
-                    ModelState.AddModelError("Input.DisplayName", $"The {Input.DisplayName} public display name is already in use.");
-                    return Page();
-                }
-
-                if (_userService.IsDisplayNameSimilar(Input.DisplayName))
-                {
-                    ModelState.AddModelError("Input.DisplayName", $"A similar public display name to {Input.DisplayName} already exists.");
+                    ModelState.AddModelError("Input.DisplayName", verifyDisplayNameResult);
                     return Page();
                 }
                 
-                var user = CreateUser();
+                var user = await _userService.CreateUserAsync(Input);
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -183,20 +172,6 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
-
-        private NuJournalUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<NuJournalUser>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(NuJournalUser)}'. " +
-                    $"Ensure that '{nameof(NuJournalUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
         }
 
         private IUserEmailStore<NuJournalUser> GetEmailStore()

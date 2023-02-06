@@ -17,7 +17,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<NuJournalUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<NuJournalUser, IdentityRole>(options =>
+                                                          { 
+                                                            options.SignIn.RequireConfirmedAccount = true;
+                                                            options.User.RequireUniqueEmail = true;
+                                                            options.Password.RequiredLength = 8;
+                                                            options.Password.RequireDigit = true;
+                                                            options.Password.RequireLowercase = true;
+                                                            options.Password.RequireUppercase = true;
+                                                            options.Password.RequireNonAlphanumeric = true;
+                                                          })
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();

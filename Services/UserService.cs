@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using NuJournalPro.Data;
 using NuJournalPro.Enums;
@@ -124,6 +125,53 @@ namespace NuJournalPro.Services
                 }
             }
             return false;
+        }
+
+        public string VerifyDisplayName(string displayName, NuJournalUser? requestingUser = null)
+        {
+            if (requestingUser == null || (requestingUser != null && !IsOwner(requestingUser)))
+            {
+                if (IsDisplayNameForbidden(displayName))
+                {
+                    return $"The public display name {displayName} is not allowed.";
+                }
+            }
+
+            if (!IsDisplayNameUnique(displayName))
+            {
+                return $"The {displayName} public display name is already in use.";
+            }
+
+            if (IsDisplayNameSimilar(displayName))
+            {
+                return $"A similar public display name to {displayName} already exists.";
+            }
+
+            return string.Empty;
+        }
+
+        public string FormatPhoneNumber(string unformatedPhoneNumber)
+        {
+            if (unformatedPhoneNumber != null)
+            {
+                string formatedPhoneNumber = Regex.Replace(unformatedPhoneNumber.ToLower(), @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", "$1-($2)-$3-$4 x$5");
+
+                if (formatedPhoneNumber.First().ToString().Equals("-"))
+                {
+                    formatedPhoneNumber = formatedPhoneNumber.Remove(0, 1);
+                }
+
+                if (formatedPhoneNumber.Last().ToString().Equals("x"))
+                {
+                    formatedPhoneNumber = formatedPhoneNumber.Remove(formatedPhoneNumber.Length - 1, 1);
+                }
+
+                formatedPhoneNumber = formatedPhoneNumber.Trim();
+
+                return formatedPhoneNumber;
+            }
+
+            return string.Empty;
         }
 
         public string GenerateRandomPassword(PasswordOptions? pwdOptions = null)
@@ -369,6 +417,66 @@ namespace NuJournalPro.Services
             }
         }
 
+        public SelectList? CreateUserRolesList(NuJournalUser requestingUser, bool? showDeletedRole = null)
+        {
+            if (requestingUser == null)
+            {
+                throw new ArgumentNullException(nameof(requestingUser));
+            }
+            else
+            {
+                if (IsOwner(requestingUser))
+                {
+                    if (showDeletedRole != null && showDeletedRole == true)
+                    {
+                        return new SelectList(Enum.GetValues(typeof(NuJournalUserRole))
+                                                  .Cast<NuJournalUserRole>()
+                                                  .Where(r => r != NuJournalUserRole.Owner)
+                                                  .ToList(), NuJournalUserRole.Reader);
+                    }
+                    else
+                    {
+                        return new SelectList(Enum.GetValues(typeof(NuJournalUserRole))
+                                                  .Cast<NuJournalUserRole>()
+                                                  .Where(r => r != NuJournalUserRole.Owner)
+                                                  .Where(r => r != NuJournalUserRole.Deleted)
+                                                  .ToList(), NuJournalUserRole.Reader);
+                    }
+                }
+                else if (IsAdmin(requestingUser))
+                {
+                    return new SelectList(Enum.GetValues(typeof(NuJournalUserRole))
+                                              .Cast<NuJournalUserRole>()
+                                              .Where(r => r != NuJournalUserRole.Owner)
+                                              .Where(r => r != NuJournalUserRole.Administrator)
+                                              .Where(r => r != NuJournalUserRole.Deleted)
+                                              .ToList(), NuJournalUserRole.Reader);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task<NuJournalUserRole> GetDefaultUserRoleAsync(NuJournalUser user)
+        {
+            var userRoles = await _userManager.GetRolesAsync(user) as List<string>;
+            
+            if (userRoles != null)
+            {
+                var availableUserRole = new NuJournalUserRole();
+                var defaultUserRole = userRoles.FirstOrDefault();
+                
+                if (Enum.TryParse<NuJournalUserRole>(defaultUserRole, out availableUserRole))
+                {
+                    return availableUserRole;
+                }
+            }
+
+            return NuJournalUserRole.Restricted;
+        }
+
         public async Task<UserInfo> GetUserInfoAsync(NuJournalUser user)
         {
             if (user == null)
@@ -436,6 +544,7 @@ namespace NuJournalPro.Services
                     userList = _userManager.Users.Cast<NuJournalUser>()
                          .Where(u => !u.UserName.Equals(user.UserName))
                          .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
                          .OrderBy(r => r.UserRoles)
                          .OrderBy(n => n.LastName)
                          .OrderBy(n => n.FirstName)
@@ -473,7 +582,37 @@ namespace NuJournalPro.Services
             }
         }
 
-        public async Task<NuJournalUser> CreateUserAsync(UserInputModel userModel, UserInfo? parentUserInfo = null, IFormFile? profilePictureFile = null)
+        public List<NuJournalUser>? GetDeletedUserList(NuJournalUser user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            else
+            {
+                if (IsOwner(user))
+                {
+                    var userList = new List<NuJournalUser>();                    
+                    userList = _userManager.Users.Cast<NuJournalUser>()
+                         .Where(u => u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
+                         .OrderBy(r => r.UserRoles)
+                         .OrderBy(n => n.LastName)
+                         .OrderBy(n => n.FirstName)
+                         .OrderBy(n => n.DisplayName)
+                         .OrderBy(e => e.Email)
+                         .ToList();
+
+                    if (userList.Count > 0)
+                    {
+                        return userList;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        public async Task<NuJournalUser> CreateUserAsync(UserInputModel userModel, NuJournalUser? parentUser = null, IFormFile? profilePictureFile = null, bool? emailConfirmed = null)
         {
             if (userModel.Email == null)
             {
@@ -481,47 +620,60 @@ namespace NuJournalPro.Services
             }
             else
             {
-                NuJournalUser newUser = Activator.CreateInstance<NuJournalUser>();
-                newUser.UserName = userModel.Email;
-                newUser.Email = userModel.Email;
+                try
+                {
+                    NuJournalUser newUser = Activator.CreateInstance<NuJournalUser>();
+                    newUser.UserName = userModel.Email;
+                    newUser.Email = userModel.Email;
 
-                if (userModel.FirstName != null)
-                {
-                    newUser.FirstName = userModel.FirstName;
-                }
-                if (userModel.MiddleName != null)
-                {
-                    newUser.MiddleName = userModel.MiddleName;
-                }
-                if (userModel.LastName != null)
-                {
-                    newUser.LastName = userModel.LastName;
-                }
-                if (userModel.DisplayName != null)
-                {
-                    newUser.DisplayName = userModel.DisplayName;
-                }
-                if (userModel.PhoneNumber != null)
-                {
-                    newUser.PhoneNumber = userModel.PhoneNumber;
-                }
+                    if (userModel.FirstName != null)
+                    {
+                        newUser.FirstName = userModel.FirstName;
+                    }
+                    if (userModel.MiddleName != null)
+                    {
+                        newUser.MiddleName = userModel.MiddleName;
+                    }
+                    if (userModel.LastName != null)
+                    {
+                        newUser.LastName = userModel.LastName;
+                    }
+                    if (userModel.DisplayName != null)
+                    {
+                        newUser.DisplayName = userModel.DisplayName;
+                    }
+                    if (userModel.PhoneNumber != null)
+                    {
+                        newUser.PhoneNumber = userModel.PhoneNumber;
+                    }
+                    if (emailConfirmed != null && emailConfirmed == true)
+                    {
+                        newUser.EmailConfirmed = true;
+                    }
 
-                if (parentUserInfo != null)
-                {
-                    if (parentUserInfo.UserName != null) newUser.CreatedByUser = parentUserInfo.UserName;
-                    if (parentUserInfo.UserRoles != null) newUser.CreatedByRoles = parentUserInfo.UserRoles;
-                }
-                else
-                {
-                    newUser.CreatedByUser = "User Service"; // In this case the User Role(s) will be added automatically by the NuJournalUser data model.
-                }
+                    if (parentUser != null && IsAdministration(parentUser))
+                    {
+                        if (parentUser.UserName != null)
+                        {
+                            newUser.CreatedByUser = parentUser.UserName;
+                        }
+                        if (parentUser.UserRoles != null)
+                        {
+                            newUser.CreatedByRoles = parentUser.UserRoles;
+                        }
+                    }
 
-                if (profilePictureFile != null)
-                {
-                    newUser.ProfilePicture = await CreateProfilePictureAsync(profilePictureFile);
-                }
+                    if (profilePictureFile != null)
+                    {
+                        newUser.ProfilePicture = await CreateProfilePictureAsync(profilePictureFile);
+                    }
 
-                return newUser;
+                    return newUser;
+                }
+                catch
+                {
+                    throw new InvalidOperationException($"Unable to create an instance of {nameof(NuJournalUser)}.");
+                }
             }
         }
 

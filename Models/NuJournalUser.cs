@@ -129,7 +129,14 @@ namespace NuJournalPro.Models
         {
             get
             {
-                return string.Join(", ", UserRoles);
+                if (UserRoles != null)
+                {
+                    return string.Join(", ", UserRoles);
+                }
+                else
+                {
+                    return "No Role";
+                }
             }
         }
 

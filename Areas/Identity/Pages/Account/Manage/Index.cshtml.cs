@@ -4,7 +4,9 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.WebSockets;
 using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,76 +33,123 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
-            _userService = userService;            
+            _userService = userService;
         }
 
         public string Username { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         [BindProperty]
-        public UserInfo UserInfo { get; set; }        
+        public UserInfo UserInput { get; set; }
 
         public IFormFile ProfilePictureFile { get; set; }
-        
+
         public bool DeleteProfilePictureCheckbox { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
-        {
-            StatusMessage = string.Empty;
-            
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            UserInfo = await _userService.GetUserInfoAsync(user);
+            UserInput = await _userService.GetUserInfoAsync(user);
 
             return Page();
         }
-        
-        public async Task<IActionResult> OnPostSaveProfileChangesAsync()
-        {
-            StatusMessage = string.Empty;
 
+        public async Task<IActionResult> OnPostSaveProfileChangesAsync(UserInfo userInput)
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            
-            
-
-
             if (!ModelState.IsValid)
             {
-                UserInfo = await _userService.GetUserInfoAsync(user);
-                return Page();
+                StatusMessage = "Error: Your profile information was not updated.";
             }
-
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (UserInfo.PhoneNumber != phoneNumber)
+            else
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, UserInfo.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                if (userInput.FirstName == user.FirstName &&
+                    userInput.MiddleName == user.MiddleName &&
+                    userInput.LastName == user.LastName &&
+                    userInput.DisplayName == user.DisplayName &&
+                    userInput.PhoneNumber == user.PhoneNumber)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = "Error: Your user profile information was not updated.";
+                }
+                else
+                {
+                    if (user.FirstName != userInput.FirstName)
+                    {
+                        user.FirstName = userInput.FirstName;
+                    }
+                    if (user.MiddleName != userInput.MiddleName)
+                    {
+                        user.MiddleName = userInput.MiddleName;
+                    }
+                    if (user.LastName != userInput.LastName)
+                    {
+                        user.LastName = userInput.LastName;
+                    }
+                    if (user.DisplayName != userInput.DisplayName)
+                    {
+                        var verifyDisplayNameResult = _userService.VerifyDisplayName(userInput.DisplayName, user);
+                        if (verifyDisplayNameResult != string.Empty)
+                        {
+                            ModelState.AddModelError(UserInput.DisplayName, verifyDisplayNameResult);
+                            UserInput = await _userService.GetUserInfoAsync(user);
+                            return Page();
+                        }
+                        else
+                        {
+                            user.DisplayName = userInput.DisplayName;
+                        }
+                    }
+
+                    var formatedInputPhoneNumber = _userService.FormatPhoneNumber(userInput.PhoneNumber);
+
+                    if (user.PhoneNumber != formatedInputPhoneNumber)
+                    {
+                        user.PhoneNumber = formatedInputPhoneNumber;
+                    }
+                    
+                    user.ModifiedByUser = user.UserName;
+                    user.ModifiedByRoles = user.UserRoles;
+                    user.Modified = DateTime.UtcNow;
+                    var userUpdateResult = await _userManager.UpdateAsync(user);
+
+                    if (!userUpdateResult.Succeeded)
+                    {
+                        StatusMessage = $"Error: Due to one or more errors, your user profile information was not saved.";
+
+                        foreach (var error in userUpdateResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                            _logger.LogError(error.Description);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("User profile information has been updated.");
+                    }
+
+                    StatusMessage = "Your user profile information has been updated.";
                     return RedirectToPage();
                 }
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            UserInput = await _userService.GetUserInfoAsync(user);
+            return Page();
         }
 
         public async Task<IActionResult> OnPostUpdateProfilePictureAsync(IFormFile profilePictureFile, bool deleteProfilePictureCheckbox)
-        {
-            StatusMessage = string.Empty;
-
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -132,13 +181,13 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                     }
                     else
                     {
-                        StatusMessage = "Your profile picture has been updated";
+                        StatusMessage = "Your profile picture has been updated.";
                     }
                 }
                 else
                 {
                     StatusMessage = "Error: Your profile picture was not updated.";
-                    UserInfo = await _userService.GetUserInfoAsync(user);
+                    UserInput = await _userService.GetUserInfoAsync(user);
                     return Page();
                 }
 
@@ -149,13 +198,21 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
                 if (!userUpdateResult.Succeeded)
                 {
-                    var profilePictureUpdateFailed = $"Error: Due to error {userUpdateResult.Errors.FirstOrDefault().Code}, your profile picture was not updated.";
-                    StatusMessage = profilePictureUpdateFailed;
-                    _logger.LogError(profilePictureUpdateFailed);
+                    StatusMessage = $"Error: Due to one or more errors, your user profile information was not completely updated.";
+
+                    foreach (var error in userUpdateResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                        _logger.LogError(error.Description);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("User profile picture has been updated.");
                 }
             }
 
-            UserInfo = await _userService.GetUserInfoAsync(user);
+            UserInput = await _userService.GetUserInfoAsync(user);
             return Page();
         }
     }
