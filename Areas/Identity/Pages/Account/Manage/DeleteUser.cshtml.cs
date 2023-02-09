@@ -141,6 +141,16 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
                             StatusMessage = $"Unable to delete user {selectedUser}.";
                         }
+
+                        AppUserList = _userService.GetAppUserList(administrativeUser);
+                        if (AppUserList != null)
+                        {
+                            ViewData["SelectUserList"] = new SelectList(AppUserList, "Email", "UserNameWithDetails", AppUserList.FirstOrDefault().Email);
+                        }
+                        else
+                        {
+                            ViewData["SelectUserList"] = null;
+                        }
                     }
                 }
             }

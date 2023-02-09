@@ -36,10 +36,10 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public bool IsMachineRemembered { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -55,7 +55,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

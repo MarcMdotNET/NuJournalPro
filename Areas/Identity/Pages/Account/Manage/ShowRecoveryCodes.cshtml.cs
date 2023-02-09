@@ -16,10 +16,10 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public string[] RecoveryCodes { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         public IActionResult OnGet()
-        {
+        {            
             if (RecoveryCodes == null || RecoveryCodes.Length == 0)
             {
                 return RedirectToPage("./TwoFactorAuthentication");

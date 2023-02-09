@@ -12,6 +12,8 @@ using NuJournalPro.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Text;
+using NuJournalPro.Services;
+using NuJournalPro.Models.Settings;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 {
@@ -43,6 +45,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
         public bool EmailConfirmedCheckbox { get; set; }
 
+        public bool GenRandomPasswdCheckbox { get; set; }
+
         public string AccessDeniedImage { get; set; }
 
         [Display(Name = "Select User Role")]
@@ -51,17 +55,10 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel NewUserInput { get; set; }
 
-        public class InputModel : UserInputModel
-        {
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 8)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public new string Password { get; set; }
-        }
+        public class InputModel : UserInputModel { }
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {            
             var administrativeUser = await _userManager.GetUserAsync(User);            
             if (administrativeUser == null)
             {
@@ -86,8 +83,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(NuJournalUserRole newUserRole, bool emailConfirmedCheckbox)
-        {
+        public async Task<IActionResult> OnPostAsync(NuJournalUserRole newUserRole, bool emailConfirmedCheckbox, bool genRandomPasswdCheckbox)
+        {            
             var administrativeUser = await _userManager.GetUserAsync(User);
             if (administrativeUser == null)
             {
@@ -105,6 +102,9 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                     if (verifyDisplayNameResult != string.Empty)
                     {
                         ModelState.AddModelError("NewUserInput.DisplayName", verifyDisplayNameResult);
+                        ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser);
+                        NewUserRole = newUserRole;
+                        NewUserInput.ProfilePicture = await _userService.GetDefaultProfilePictureAsync();
                         return Page();
                     }
 
@@ -119,6 +119,22 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                     }
 
                     newUser.UserRoles.Add(newUserRole.ToString());
+                    
+                    if (!genRandomPasswdCheckbox)
+                    {
+                        if (NewUserInput.Password == null || NewUserInput.Password == string.Empty)
+                        {
+                            ModelState.AddModelError("NewUserInput.Password", "The Password field is required.");
+                            ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser);
+                            NewUserRole = newUserRole;
+                            NewUserInput.ProfilePicture = await _userService.GetDefaultProfilePictureAsync();
+                            return Page();
+                        }
+                    }
+                    else
+                    {
+                        NewUserInput.Password = _userService.GenerateRandomPassword();
+                    }
 
                     var userCreationResult = await _userManager.CreateAsync(newUser, NewUserInput.Password);
 
@@ -139,6 +155,13 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                             var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = newUserId, code = code, returnUrl = returnUrl }, protocol: Request.Scheme);
 
                             await _emailSender.SendEmailAsync(newUser.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        }
+
+                        if (genRandomPasswdCheckbox)
+                        {
+                            await _emailSender.SendEmailAsync(newUser.Email,
+                                  $"Temporary password for account: {newUser.DisplayName}",
+                                  $"<p>Your temporary password for the account <b>{newUser.DisplayName}</b> is: <b>{NewUserInput.Password}</b></p><p>Please change your password after logging in.</p><p>Thank you</p>");
                         }
 
                         return RedirectToPage();

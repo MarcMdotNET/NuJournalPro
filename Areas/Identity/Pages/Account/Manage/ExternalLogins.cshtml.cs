@@ -38,7 +38,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public bool ShowRemoveButton { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -64,7 +64,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostRemoveLoginAsync(string loginProvider, string providerKey)
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -84,7 +84,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostLinkLoginAsync(string provider)
-        {
+        {            
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
@@ -95,7 +95,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnGetLinkLoginCallbackAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

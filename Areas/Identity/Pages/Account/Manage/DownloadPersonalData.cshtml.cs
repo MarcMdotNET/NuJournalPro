@@ -29,6 +29,9 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; } = string.Empty;
+
         public IActionResult OnGet()
         {
             return NotFound();

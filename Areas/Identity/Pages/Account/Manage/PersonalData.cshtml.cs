@@ -23,8 +23,11 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; } = string.Empty;
+
         public async Task<IActionResult> OnGet()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

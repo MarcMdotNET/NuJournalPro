@@ -68,7 +68,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public UserInputModel SelectedUserInput { get; set; } = new UserInputModel();
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {           
             UserFormVisibility = false;
 
             var administrativeUser = await _userManager.GetUserAsync(User);
@@ -79,7 +79,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
             if (_userService.IsAdministration(administrativeUser))
             {
-                AppUserList = _userService.GetAppUserList(administrativeUser);
+                AppUserList = _userService.GetAppUserList(administrativeUser, true);
                 if (AppUserList != null)
                 {
                     ViewData["SelectUserList"] = new SelectList(AppUserList, "Email", "UserNameWithDetails", AppUserList.FirstOrDefault().Email);
@@ -100,7 +100,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostSelectUserAsync(string selectedUserEmail)
-        {
+        {            
             var administrativeUser = await _userManager.GetUserAsync(User);
             if (administrativeUser == null)
             {
@@ -131,7 +131,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                     UserFormVisibility = true;
                 }
                 else
-                {
+                {                    
                     UserFormVisibility = false;
                 }
             }
@@ -145,6 +145,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostModifyUserAsync(UserInputModel selectedUserInput, NuJournalUserRole selectedUserRole, bool deleteProfilePictureCheckbox)
         {
+            StatusMessage = string.Empty;
+
             var administrativeUser = await _userManager.GetUserAsync(User);
             if (administrativeUser == null)
             {

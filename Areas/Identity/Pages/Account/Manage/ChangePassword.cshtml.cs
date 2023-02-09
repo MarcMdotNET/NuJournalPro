@@ -33,7 +33,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public InputModel Input { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         public class InputModel
         {

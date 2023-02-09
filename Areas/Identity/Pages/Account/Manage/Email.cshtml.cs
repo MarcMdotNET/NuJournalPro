@@ -37,7 +37,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public bool IsEmailConfirmed { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -76,7 +76,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostChangeEmailAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -114,7 +114,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostSendVerificationEmailAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

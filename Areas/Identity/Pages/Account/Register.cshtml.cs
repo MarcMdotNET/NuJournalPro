@@ -90,7 +90,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
 
                 if (verifyDisplayNameResult != string.Empty)
                 {
-                    ModelState.AddModelError("Input.DisplayName", verifyDisplayNameResult);
+                    ModelState.AddModelError("LinksInput.DisplayName", verifyDisplayNameResult);
                     return Page();
                 }
                 

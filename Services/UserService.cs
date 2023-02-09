@@ -545,8 +545,7 @@ namespace NuJournalPro.Services
                     {
                         userList = _userManager.Users.Cast<NuJournalUser>()
                              .Where(u => !u.UserName.Equals(user.UserName))
-                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
-                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
+                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))                             
                              .OrderBy(r => r.UserRoles)
                              .OrderBy(n => n.LastName)
                              .OrderBy(n => n.FirstName)
@@ -559,6 +558,7 @@ namespace NuJournalPro.Services
                         userList = _userManager.Users.Cast<NuJournalUser>()
                              .Where(u => !u.UserName.Equals(user.UserName))
                              .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
                              .OrderBy(r => r.UserRoles)
                              .OrderBy(n => n.LastName)
                              .OrderBy(n => n.FirstName)

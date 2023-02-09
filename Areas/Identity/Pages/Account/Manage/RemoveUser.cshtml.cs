@@ -41,7 +41,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public string ConfirmUserName { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {            
             var administrativeUser = await _userManager.GetUserAsync(User);
 
             if (administrativeUser == null)
@@ -70,7 +70,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         }
 
         public async Task<IActionResult> OnPostAsync(string selectedUser, string confirmUserName)
-        {
+        {            
             var administrativeUser = await _userManager.GetUserAsync(User);
             if (administrativeUser == null)
             {

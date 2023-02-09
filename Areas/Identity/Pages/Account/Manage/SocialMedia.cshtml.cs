@@ -24,10 +24,10 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public string Username { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string StatusMessage { get; set; } = string.Empty;
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel LinksInput { get; set; } = new InputModel();
 
         public class InputModel
         {
@@ -63,25 +63,22 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             public string InstagramUrl { get; set; }
         }
 
-        private async Task LoadAsync(NuJournalUser user)
-        {
+        private async Task LoadSocialMediaAsync(NuJournalUser user)
+        {            
             var userName = await _userManager.GetUserNameAsync(user);
 
             Username = userName;
 
-            Input = new InputModel
-            {
-                GitHubUrl = user.GitHubUrl,
-                TwitterUrl = user.TwitterUrl,
-                LinkedInUrl = user.LinkedInUrl,
-                YouTubeUrl = user.YouTubeUrl,
-                FacebookUrl = user.FacebookUrl,
-                InstagramUrl = user.InstagramUrl
-            };
+            LinksInput.GitHubUrl = user.GitHubUrl;
+            LinksInput.TwitterUrl = user.TwitterUrl;
+            LinksInput.LinkedInUrl = user.LinkedInUrl;
+            LinksInput.YouTubeUrl = user.YouTubeUrl;
+            LinksInput.FacebookUrl = user.FacebookUrl;
+            LinksInput.InstagramUrl = user.InstagramUrl;
         }
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
@@ -89,12 +86,12 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            await LoadSocialMediaAsync(user);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
+        public async Task<IActionResult> OnPostAsync(InputModel linksInput)
+        {            
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
@@ -104,23 +101,65 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
-                return Page();
+                await LoadSocialMediaAsync(user);
             }
-
-            if (Input.GitHubUrl != user.GitHubUrl || Input.TwitterUrl != user.TwitterUrl || Input.LinkedInUrl != user.LinkedInUrl || Input.YouTubeUrl != user.YouTubeUrl || Input.FacebookUrl != user.FacebookUrl || Input.InstagramUrl != user.InstagramUrl)
+            else
             {
-                user.GitHubUrl = Input.GitHubUrl;
-                user.TwitterUrl = Input.TwitterUrl;
-                user.LinkedInUrl = Input.LinkedInUrl;
-                user.YouTubeUrl = Input.YouTubeUrl;
-                user.FacebookUrl = Input.FacebookUrl;
-                user.InstagramUrl = Input.InstagramUrl;
-                await _userManager.UpdateAsync(user);
-                StatusMessage = "Your social media links have been updated";
+                if (linksInput.GitHubUrl == user.GitHubUrl &&
+                    linksInput.TwitterUrl == user.TwitterUrl &&
+                    linksInput.LinkedInUrl == user.LinkedInUrl &&
+                    linksInput.YouTubeUrl == user.YouTubeUrl &&
+                    linksInput.FacebookUrl == user.FacebookUrl &&
+                    linksInput.InstagramUrl == user.InstagramUrl)
+                {
+                    StatusMessage = "Error: No changes were made to your social media links.";
+                    await LoadSocialMediaAsync(user);                    
+                }
+                else
+                {
+                    if (linksInput.GitHubUrl != user.GitHubUrl)
+                    {
+                        user.GitHubUrl = linksInput.GitHubUrl;
+                    }
+                    if (linksInput.TwitterUrl != user.TwitterUrl)
+                    {
+                        user.TwitterUrl = linksInput.TwitterUrl;
+                    }
+                    if (linksInput.LinkedInUrl != user.LinkedInUrl)
+                    {
+                        user.LinkedInUrl = linksInput.LinkedInUrl;
+                    }
+                    if (linksInput.YouTubeUrl != user.YouTubeUrl)
+                    {
+                        user.YouTubeUrl = linksInput.YouTubeUrl;
+                    }
+                    if (linksInput.FacebookUrl != user.FacebookUrl)
+                    {
+                        user.FacebookUrl = linksInput.FacebookUrl;
+                    }
+                    if (linksInput.InstagramUrl != user.InstagramUrl)
+                    {
+                        user.InstagramUrl = linksInput.InstagramUrl;
+                    }
+
+                    var userUpdateStatus = await _userManager.UpdateAsync(user);
+
+                    if (userUpdateStatus.Succeeded)
+                    {
+                        StatusMessage = "Your social media links have been succesfully updated.";
+                        _logger.LogInformation($"The social media links for user {user} have been succesfully updated.");
+                    }
+                    else
+                    {
+                        StatusMessage = "Error: An error occured while updating your social media links.";
+                        _logger.LogError($"An error occured while updating the social media links for user {user}.");
+                    }
+                    
+                    await LoadSocialMediaAsync(user);
+                }
             }
 
-            return RedirectToPage();
+            return Page();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
         public string AccessDeniedImage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
-        {
+        {            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

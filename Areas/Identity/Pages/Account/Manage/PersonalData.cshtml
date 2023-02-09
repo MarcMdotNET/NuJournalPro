@@ -10,19 +10,22 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+                <p>Your account contains personal data that you have given us. This page allows you to download that data.</p>
                 <form id="download-data" asp-page="DownloadPersonalData" method="post">
                     <button class="btn btn-lg btn-primary w-100" type="submit">Download</button>
                 </form>
-                <hr class="my-4" />
-                <div class="mt-4">
-                    <div class="alert alert-warning alert-icon alert-dismissible fade show" role="alert">
-                        <i class="uil uil-exclamation-triangle"></i> Deleting this data will permanently remove your account, and this cannot be recovered.                        
+                @if (!User.IsInRole("Owner"))
+                {
+                    <hr class="my-4" />
+                    <div class="mt-4">
+                        <div class="alert alert-warning alert-icon alert-dismissible fade show" role="alert">
+                            <i class="uil uil-exclamation-triangle"></i> This option will delete your account. The content that you posted to this website will not be deleted.
+                        </div>
+                        <p>
+                            <a id="delete" asp-page="DeletePersonalData" class="btn btn-lg btn-danger w-100">Delete</a>
+                        </p>
                     </div>
-                    <p>
-                        <a id="delete" asp-page="DeletePersonalData" class="btn btn-lg btn-danger w-100">Delete</a>
-                    </p>
-                </div>
+                }
             </div>
         </div>
     </div>
