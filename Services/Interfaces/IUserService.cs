@@ -29,7 +29,7 @@ namespace NuJournalPro.Services.Interfaces
         Task<NuJournalUserRole> GetDefaultUserRoleAsync(NuJournalUser user);
         Task<UserInfo> GetUserInfoAsync(NuJournalUser user);
         Task<UserInputModel> GetUserInputAsync(NuJournalUser existingUser);
-        List<NuJournalUser>? GetAppUserList(NuJournalUser user);
+        List<NuJournalUser>? GetAppUserList(NuJournalUser user, bool? showDeletedUsers = null);
         List<NuJournalUser>? GetDeletedUserList(NuJournalUser user);
         Task<NuJournalUser> CreateUserAsync(UserInputModel userModel, NuJournalUser? parentUser = null, IFormFile? profilePictureFile = null, bool? emailConfirmed = null);
         bool DeleteUserAccount(NuJournalUser user);

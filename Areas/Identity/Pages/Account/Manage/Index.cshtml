@@ -1,7 +1,7 @@
 ﻿@page
 @model PersonalProfileModel
 @{
-    ViewData["Title"] = "Profile: ";
+    ViewData["Title"] = "Profile: " + Model.UserRole.ToString();
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 

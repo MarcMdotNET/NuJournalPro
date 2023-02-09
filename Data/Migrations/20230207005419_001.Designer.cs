@@ -13,7 +13,7 @@ using NuJournalPro.Data;
 namespace NuJournalPro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230205213536_001")]
+    [Migration("20230207005419_001")]
     partial class _001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -795,7 +795,8 @@ namespace NuJournalPro.Data.Migrations
                 {
                     b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithOne("ProfilePicture")
-                        .HasForeignKey("NuJournalPro.Models.Database.ProfilePicture", "NuJournalUserId");
+                        .HasForeignKey("NuJournalPro.Models.Database.ProfilePicture", "NuJournalUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("NuJournalUser");
                 });

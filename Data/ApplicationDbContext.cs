@@ -20,5 +20,14 @@ namespace NuJournalPro.Data
         public DbSet<BlogImage>? BlogImage { get; set; }
         public DbSet<PostImage>? PostImage { get; set; }
         public DbSet<ProfilePicture>? ProfilePicture { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ProfilePicture>()
+                .HasOne(pp => pp.NuJournalUser)
+                .WithOne(u => u.ProfilePicture)
+                .HasForeignKey<ProfilePicture>(pp => pp.NuJournalUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }                          
     }
 }

@@ -793,7 +793,8 @@ namespace NuJournalPro.Data.Migrations
                 {
                     b.HasOne("NuJournalPro.Models.NuJournalUser", "NuJournalUser")
                         .WithOne("ProfilePicture")
-                        .HasForeignKey("NuJournalPro.Models.Database.ProfilePicture", "NuJournalUserId");
+                        .HasForeignKey("NuJournalPro.Models.Database.ProfilePicture", "NuJournalUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("NuJournalUser");
                 });

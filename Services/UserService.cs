@@ -530,7 +530,7 @@ namespace NuJournalPro.Services
             }
         }
 
-        public List<NuJournalUser>? GetAppUserList(NuJournalUser user)
+        public List<NuJournalUser>? GetAppUserList(NuJournalUser user, bool? showDeletedUsers = null)
         {
             if (user == null)
             {
@@ -541,16 +541,31 @@ namespace NuJournalPro.Services
                 var userList = new List<NuJournalUser>();
                 if (IsOwner(user))
                 {
-                    userList = _userManager.Users.Cast<NuJournalUser>()
-                         .Where(u => !u.UserName.Equals(user.UserName))
-                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
-                         .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
-                         .OrderBy(r => r.UserRoles)
-                         .OrderBy(n => n.LastName)
-                         .OrderBy(n => n.FirstName)
-                         .OrderBy(n => n.DisplayName)
-                         .OrderBy(e => e.Email)
-                         .ToList();
+                    if (showDeletedUsers != null && showDeletedUsers == true)
+                    {
+                        userList = _userManager.Users.Cast<NuJournalUser>()
+                             .Where(u => !u.UserName.Equals(user.UserName))
+                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Deleted.ToString()))
+                             .OrderBy(r => r.UserRoles)
+                             .OrderBy(n => n.LastName)
+                             .OrderBy(n => n.FirstName)
+                             .OrderBy(n => n.DisplayName)
+                             .OrderBy(e => e.Email)
+                             .ToList();
+                    }
+                    else
+                    {
+                        userList = _userManager.Users.Cast<NuJournalUser>()
+                             .Where(u => !u.UserName.Equals(user.UserName))
+                             .Where(u => !u.UserRoles.Contains(NuJournalUserRole.Owner.ToString()))
+                             .OrderBy(r => r.UserRoles)
+                             .OrderBy(n => n.LastName)
+                             .OrderBy(n => n.FirstName)
+                             .OrderBy(n => n.DisplayName)
+                             .OrderBy(e => e.Email)
+                             .ToList();
+                    }
                 }
                 else if (!IsOwner(user) && IsAdmin(user))
                 {

@@ -111,13 +111,22 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             {
                 var selectedUser = await _userManager.FindByEmailAsync(selectedUserEmail);
 
-                AppUserList = _userService.GetAppUserList(administrativeUser);
+                AppUserList = _userService.GetAppUserList(administrativeUser, true);
 
                 if (AppUserList != null)
                 {
                     ViewData["SelectUserList"] = new SelectList(AppUserList, "Email", "UserNameWithDetails");
                     SelectedUserInput = await _userService.GetUserInputAsync(selectedUser);
-                    ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser);
+                    var selectedUserRole = new NuJournalUserRole();
+                    selectedUserRole = await _userService.GetDefaultUserRoleAsync(selectedUser);
+                    if (selectedUserRole.Equals(NuJournalUserRole.Deleted))
+                    {
+                        ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser, true);
+                    }
+                    else
+                    {
+                        ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser);
+                    }                    
                     SelectedUserRole = await _userService.GetDefaultUserRoleAsync(selectedUser);
                     UserFormVisibility = true;
                 }
@@ -148,7 +157,7 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
                 
                 ViewData["UserRolesList"] = _userService.CreateUserRolesList(administrativeUser);
 
-                AppUserList = _userService.GetAppUserList(administrativeUser);
+                AppUserList = _userService.GetAppUserList(administrativeUser, true);
 
                 if (AppUserList != null)
                 {

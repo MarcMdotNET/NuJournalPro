@@ -239,7 +239,8 @@ namespace NuJournalPro.Data.Migrations
                         name: "FK_ProfilePicture_AspNetUsers_NuJournalUserId",
                         column: x => x.NuJournalUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

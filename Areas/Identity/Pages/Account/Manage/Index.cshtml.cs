@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NuJournalPro.Enums;
 using NuJournalPro.Models;
 using NuJournalPro.Models.Identity;
 using NuJournalPro.Services.Interfaces;
@@ -38,6 +39,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
 
         public string Username { get; set; }
 
+        public NuJournalUserRole UserRole { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; } = string.Empty;
 
@@ -55,6 +58,8 @@ namespace NuJournalPro.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+
+            UserRole = await _userService.GetDefaultUserRoleAsync(user);
 
             UserInput = await _userService.GetUserInfoAsync(user);
 
