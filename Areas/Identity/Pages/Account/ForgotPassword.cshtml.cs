@@ -13,7 +13,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using NuJournalPro.Enums;
 using NuJournalPro.Models;
+using NuJournalPro.Services.Interfaces;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account
 {
@@ -21,11 +23,15 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
     {
         private readonly UserManager<NuJournalUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IUserService _userService;
 
-        public ForgotPasswordModel(UserManager<NuJournalUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<NuJournalUser> userManager,
+                                   IEmailSender emailSender,
+                                   IUserService userService)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _userService = userService;
         }
 
         [BindProperty]
@@ -43,7 +49,9 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                var userRole = await _userService.GetDefaultUserRoleAsync(user);
+
+                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)) || userRole == NuJournalUserRole.Deleted)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");

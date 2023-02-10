@@ -60,10 +60,10 @@ else
     ViewData["ActivePage"] = ManageNavPages.Index;
     <h3>@ViewData["Title"]</h3>
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col">
             <partial name="_StatusMessage" for="StatusMessage" />
-            <div class="any-img-container-half-height">
-                <img id="accessDeniedImage" class="any-img-half-height" src="@Model.AccessDeniedImage" alt="Access Denied" />
+            <div class="mt-4">
+                <img id="accessDeniedImage" src="@Model.AccessDeniedImage" alt="Access Denied" />
             </div>
         </div>
     </div>

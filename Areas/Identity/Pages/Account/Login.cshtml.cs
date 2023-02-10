@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using NuJournalPro.Models;
+using NuJournalPro.Services.Interfaces;
+using NuJournalPro.Enums;
 
 namespace NuJournalPro.Areas.Identity.Pages.Account
 {
@@ -22,11 +24,18 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<NuJournalUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<NuJournalUser> _userManager;
+        private readonly IUserService _userService;
 
-        public LoginModel(SignInManager<NuJournalUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<NuJournalUser> signInManager,
+                          ILogger<LoginModel> logger,
+                          UserManager<NuJournalUser> userManager,
+                          IUserService userService)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
+            _userService = userService;            
         }
 
         [BindProperty]
@@ -78,11 +87,22 @@ namespace NuJournalPro.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByEmailAsync(Input.Email);                
+                if (user != null)
+                {
+                    var userRole = await _userService.GetDefaultUserRoleAsync(user);
+                    if (userRole == NuJournalUserRole.Deleted)
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return Page();
+                    }
+                }
+ 
                 // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true                                
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
-                {
+                {                    
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

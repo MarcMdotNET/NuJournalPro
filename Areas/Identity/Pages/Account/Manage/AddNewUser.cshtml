@@ -7,8 +7,8 @@
     if (isOwner || isAdmin)
     {
         ViewData["Title"] = "Add New User Account";
-        if (isOwner) ViewData["ActivePage"] = ManageNavPages.OwnerPanel;        
-        if (isAdmin) ViewData["ActivePage"] = ManageNavPages.AdminPanel;        
+        if (isOwner) ViewData["ActivePage"] = ManageNavPages.OwnerPanel;
+        if (isAdmin) ViewData["ActivePage"] = ManageNavPages.AdminPanel;
 
         <h3>@ViewData["Title"]</h3>
         <partial name="_StatusMessage" for="StatusMessage" />
@@ -113,9 +113,9 @@
         ViewData["ActivePage"] = ManageNavPages.Index;
         <h3 class="text-danger">@ViewData["Title"]</h3>
         <div class="row d-flex justify-content-center">
-            <div class="col-lg-6">
-                <div class="any-square-img-container">
-                    <img id="accessDeniedImage" class="any-square-img" src="@Model.AccessDeniedImage" alt="Access Denied" />
+            <div class="col">
+                <div class="mt-4">
+                    <img id="accessDeniedImage" src="@Model.AccessDeniedImage" alt="Access Denied" />
                 </div>
             </div>
         </div>
