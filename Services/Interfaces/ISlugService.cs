@@ -3,6 +3,6 @@
     public interface ISlugService
     {
         string UrlFriendly(string title);
-        bool IsAvailable(string slug);
+        bool IsUnique(string slug);
     }
 }
