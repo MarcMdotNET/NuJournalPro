@@ -2,25 +2,35 @@
 @inject SignInManager<NuJournalUser> SignInManager
 @inject UserManager<NuJournalUser> UserManager
 
+@{
+    NuJournalUser nuJournalUser = await UserManager.GetUserAsync(User);
+    bool isSignedIn = SignInManager.IsSignedIn(User);
+    string displayName = "User";
+    if (isSignedIn && nuJournalUser != null)
+    {
+        displayName = nuJournalUser.DisplayName;
+    }
+}
+
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-            <a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+    @if (isSignedIn)
+    {
+        <li class="nav-item">
+            <a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @displayName<span>!</span></a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button type="submit" class="mt-2 nav-link px-lg-4 py-4 py-lg-2 btn-gradient gradient-7 rounded-pill">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
             <a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
+        </li>
+        <li class="nav-item">
             <a class="nav-link px-lg-3 py-3 py-lg-4" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+        </li>
+    }
 </ul>
