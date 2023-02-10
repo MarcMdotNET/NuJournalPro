@@ -43,9 +43,11 @@ builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("
 
 // Register custom services.
 builder.Services.AddScoped<IEmailSender, EmailService>();
+builder.Services.AddScoped<IContactEmailSender, ContactEmailSender>();
 builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<SetupDataService>();
+builder.Services.AddScoped<ISlugService, SlugService>();
 
 var app = builder.Build();
 
