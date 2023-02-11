@@ -13,19 +13,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetSection("pgsqlSettings")["pgsqlConnection"];
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));                                                        
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<NuJournalUser, IdentityRole>(options =>
-                                                          { 
-                                                            options.SignIn.RequireConfirmedAccount = true;
-                                                            options.User.RequireUniqueEmail = true;
-                                                            options.Password.RequiredLength = 8;
-                                                            options.Password.RequireDigit = true;
-                                                            options.Password.RequireLowercase = true;
-                                                            options.Password.RequireUppercase = true;
-                                                            options.Password.RequireNonAlphanumeric = true;
+                                                          {
+                                                              options.SignIn.RequireConfirmedAccount = true;
+                                                              options.User.RequireUniqueEmail = true;
+                                                              options.Password.RequiredLength = 8;
+                                                              options.Password.RequireDigit = true;
+                                                              options.Password.RequireLowercase = true;
+                                                              options.Password.RequireUppercase = true;
+                                                              options.Password.RequireNonAlphanumeric = true;
                                                           })
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
@@ -42,6 +42,7 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.Configure<ContactUsSettings>(builder.Configuration.GetSection("ContactUsSettings"));
 
 // Register custom services.
+builder.Services.AddSingleton<IServerService, ServerService>();
 builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddScoped<IContactEmailSender, ContactEmailSender>();
 builder.Services.AddSingleton<IImageService, ImageService>();
@@ -66,6 +67,8 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseStatusCodePagesWithReExecute("/Home/ErrorHandler/{0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
