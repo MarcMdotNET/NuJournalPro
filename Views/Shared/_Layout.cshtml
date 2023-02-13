@@ -1,15 +1,20 @@
-﻿<!DOCTYPE html>
+﻿@inject NuJournalPro.Services.Interfaces.IDefaultGraphicsService DefaultGraphicsService
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NuJournalPro</title>
-    <link rel="shortcut icon" href="~/lib/sandbox/img/favicon.png" />
-    <link rel="stylesheet" href="~/lib/sandbox/css/plugins.css" />
-    <link rel="stylesheet" href="~/lib/sandbox/css/style.css" />
-    <link rel="stylesheet" href="~/lib/sandbox/css/colors/navy.css" />
-    <link rel="preload" href="~/lib/sandbox/css/fonts/urbanist.css" as="style" onload="this.rel='stylesheet'" />
-    <link rel="stylesheet" href="~/lib/sandbox/css/custom.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="~/lib/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/lib/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/lib/favicon/favicon-16x16.png">
+    <link rel="manifest" href="~/lib/favicon/site.webmanifest">
+    <link rel="stylesheet" href="~/lib/njpui/css/plugins.css" />
+    <link rel="stylesheet" href="~/lib/njpui/css/style.css" />
+    <link rel="stylesheet" href="~/lib/njpui/css/colors/navy.css" />
+    <link rel="preload" href="~/lib/njpui/css/fonts/urbanist.css" as="style" onload="this.rel='stylesheet'" />
+    <link rel="stylesheet" href="~/lib/njpui/css/custom.css" />
 </head>
 <body>
     <div class="content-wrapper">        
@@ -18,7 +23,7 @@
                 <div class="container flex-lg-row flex-nowrap align-items-center">
                     <div class="navbar-brand w-100">
                         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                            <img src="~/lib/sandbox/img/logo-dark.png" srcset="~/lib/sandbox/img/logo-dark@2x.png 2x" alt="" />
+                            <img src="@await DefaultGraphicsService.GetDefaultTopNavLogo()" height="50" alt="NuJournal.Pro Logo" />
                         </a>
                     </div>
                     <div class="navbar-collapse offcanvas offcanvas-nav offcanvas-start">
@@ -75,7 +80,7 @@
                     <h4 class="widget-title text-white mb-3">Popular Posts</h4>
                     <ul class="image-list">
                         <li>
-                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a4.jpg" alt="" /></a></figure>
+                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/njpui/img/photos/a4.jpg" alt="" /></a></figure>
                             <div class="post-content">
                                 <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Magna Mollis Ultricies</a> </h6>
                                 <ul class="post-meta">
@@ -84,7 +89,7 @@
                             </div>
                         </li>
                         <li class="mt-5">
-                            <figure class="rounded"> <a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a5.jpg" alt="" /></a></figure>
+                            <figure class="rounded"> <a href="./blog-post.html"><img src="~/lib/njpui/img/photos/a5.jpg" alt="" /></a></figure>
                             <div class="post-content">
                                 <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Ornare Nullam Risus</a> </h6>
                                 <ul class="post-meta">
@@ -93,7 +98,7 @@
                             </div>
                         </li>
                         <li class="mt-5">
-                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/sandbox/img/photos/a6.jpg" alt="" /></a></figure>
+                            <figure class="rounded"><a href="./blog-post.html"><img src="~/lib/njpui/img/photos/a6.jpg" alt="" /></a></figure>
                             <div class="post-content">
                                 <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Euismod Nullam Fusce</a> </h6>
                                 <ul class="post-meta">
@@ -167,8 +172,8 @@
         </svg>
     </div>
     @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
-    <script src="~/lib/sandbox/js/plugins.js"></script>
-    <script src="~/lib/sandbox/js/theme.js"></script>
+    <script src="~/lib/njpui/js/plugins.js"></script>
+    <script src="~/lib/njpui/js/theme.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

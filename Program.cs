@@ -49,6 +49,7 @@ builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<SetupDataService>();
 builder.Services.AddScoped<ISlugService, SlugService>();
+builder.Services.AddSingleton<IDefaultGraphicsService, DefaultGraphicsService>();
 
 var app = builder.Build();
 
