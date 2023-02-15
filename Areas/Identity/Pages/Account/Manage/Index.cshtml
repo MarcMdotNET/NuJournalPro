@@ -1,6 +1,5 @@
 ﻿@page
 @model PersonalProfileModel
-@inject NuJournalPro.Services.Interfaces.IImageService ImageService
 @{
     ViewData["Title"] = "Profile: " + Model.UserRole.ToString();
     ViewData["ActivePage"] = ManageNavPages.Index;
@@ -57,9 +56,6 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="square-img-container">
                         <img id="contactImage" class="square-img" src="@Model.UserInput.ProfilePicture?.DecodedImage" alt="Profile Picture" />
-                    </div>
-                    <div class="mt-4">
-                        @ImageService.CompressDecodedImageB64(Model.UserInput.ProfilePicture.DecodedImage)
                     </div>
                     <div class="mt-4">
                         <label asp-for="ProfilePictureFile" class="control-label" class="form-label">Select a profile picture for @Model.UserInput.Email</label>

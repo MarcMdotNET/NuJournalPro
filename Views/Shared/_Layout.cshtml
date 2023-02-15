@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/lib/njpui/css/style.css" />
     <link rel="stylesheet" href="~/lib/njpui/css/colors/navy.css" />
     <link rel="preload" href="~/lib/njpui/css/fonts/urbanist.css" as="style" onload="this.rel='stylesheet'" />
+    <link rel="stylesheet" href="~/lib/summernote/css/summernote-lite.css" />
     <link rel="stylesheet" href="~/lib/njpui/css/custom.css" />
 </head>
 <body>
@@ -171,10 +172,11 @@
             <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
         </svg>
     </div>
-    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
-    <script src="~/lib/njpui/js/plugins.js"></script>
-    <script src="~/lib/njpui/js/theme.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/summernote/js/summernote-lite.min.js"></script>
+    <script src="~/lib/njpui/js/plugins.js"></script>
+    <script src="~/lib/njpui/js/theme.js"></script>   
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
